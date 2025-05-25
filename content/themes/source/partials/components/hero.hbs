@@ -1,0 +1,41 @@
+{{!-- Hero Section --}}
+<section class="gh-hero gh-outer">
+    <div class="gh-hero-inner gh-inner">
+        <div class="gh-hero-content">
+            {{!-- Manual avatar image with fallback --}}
+            <div class="gh-hero-author-image">
+                <a href="{{@site.url}}" aria-label="Josh - Marketing Expert">
+                    <img class="gh-hero-author-img" 
+                         src="{{asset "images/josh-avatar.jpg"}}" 
+                         alt="Josh - Marketing Expert Profile Image"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div class="gh-hero-author-fallback" style="display: none;">
+                        J
+                    </div>
+                </a>
+            </div>
+            
+            <div class="gh-hero-text">
+                {{!-- Hero title --}}
+                <h1 class="gh-hero-title">
+                    {{#if @custom.hero_title}}
+                        {{@custom.hero_title}}
+                    {{else}}
+                        Marketing Expert Shaping Purpose-Propelled Campaigns for Major Brands
+                    {{/if}}
+                </h1>
+                
+                {{!-- Hero description --}}
+                {{#if @custom.hero_description}}
+                    <p class="gh-hero-description">
+                        {{@custom.hero_description}}
+                    </p>
+                {{else}}
+                    <p class="gh-hero-description">
+                        Josh is a multidisciplinary force in branding and marketing. Equal parts strategist, storyteller, and systems thinker, they lead purpose-driven campaigns that move hearts, minds, and society.
+                    </p>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</section> 

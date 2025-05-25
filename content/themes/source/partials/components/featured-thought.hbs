@@ -1,0 +1,66 @@
+{{#get "posts" filter="featured:true+tag:thoughts-and-perspectives" limit="1" include="tags,authors" as |featured_thought|}}
+    {{#if featured_thought}}
+        <section class="gh-featured-thought">
+            {{#foreach featured_thought}}
+                <article class="gh-featured-thought-card">
+                    <div class="gh-featured-thought-background">
+                        {{#if feature_image}}
+                            <div class="gh-featured-thought-image-container">
+                                <img class="gh-featured-thought-image" src="{{feature_image}}" alt="{{title}}">
+                            </div>
+                        {{/if}}
+                        <div class="gh-featured-thought-overlay"></div>
+                    </div>
+                    
+                    <div class="gh-featured-thought-wrapper">
+                        <div class="gh-inner">
+                            <div class="gh-featured-thought-content">
+                                <div class="gh-featured-thought-tag">
+                                    {{#if featured}}
+                                        <span class="gh-featured-thought-featured-badge">
+                                            {{> "icons/lightning"}}
+                                            <span>Featured</span>
+                                        </span>
+                                    {{/if}}
+                                    {{#primary_tag}}
+                                        <a href="{{url}}" class="gh-featured-thought-tag-link">{{name}}</a>
+                                    {{/primary_tag}}
+                                </div>
+                                
+                                <h2 class="gh-featured-thought-title">
+                                    <a href="{{url}}" class="gh-featured-thought-title-link">
+                                        {{title}}
+                                    </a>
+                                </h2>
+                                
+                                {{#if excerpt}}
+                                    <p class="gh-featured-thought-excerpt">{{excerpt}}</p>
+                                {{/if}}
+                                
+                                <div class="gh-featured-thought-meta">
+                                    {{#if primary_author}}
+                                        <div class="gh-featured-thought-author">
+                                            {{#if primary_author.profile_image}}
+                                                <a href="{{primary_author.url}}" class="gh-featured-thought-author-image-link">
+                                                    <img src="{{primary_author.profile_image}}" alt="{{primary_author.name}}" class="gh-featured-thought-author-image">
+                                                </a>
+                                            {{/if}}
+                                            <a href="{{primary_author.url}}" class="gh-featured-thought-author-name">{{primary_author.name}}</a>
+                                        </div>
+                                    {{/if}}
+                                    <time class="gh-featured-thought-date" datetime="{{date format="YYYY-MM-DD"}}">{{date format="D MMM YYYY"}}</time>
+                                    <span class="gh-featured-thought-reading-time">{{reading_time}}</span>
+                                </div>
+                                
+                                <a href="{{url}}" class="gh-featured-thought-button gh-button">
+                                    <span>Read Article</span>
+                                    {{> "icons/arrow-right"}}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            {{/foreach}}
+        </section>
+    {{/if}}
+{{/get}} 

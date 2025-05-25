@@ -1,0 +1,37 @@
+{{!< default}}
+{{!-- The tag above means: insert everything in this file into the body of the default.hbs template --}}
+
+{{!-- Hero/Header Section --}}
+{{> "components/header" headerStyle="Hero"}}
+
+{{!-- Featured Thought Section --}}
+{{> "components/featured-thought"}}
+
+{{!-- Latest Thoughts Section --}}
+{{> "components/latest-thoughts"}}
+
+{{!-- Skills Section --}}
+{{> "components/skills"}}
+
+{{!-- Brand Carousel Section --}}
+{{> "components/brand-carousel"}}
+
+{{!-- Featured Role Section --}}
+{{> "components/featured-role"}}
+
+{{!-- Case Studies Section --}}
+{{> "components/case-studies"}}
+
+{{!-- Membership Section --}}
+{{> "components/membership"}}
+
+{{!-- Featured Posts Section --}}
+{{#match "Hero" "!=" "Highlight"}}
+    {{> "components/featured" showFeatured=@custom.show_featured_posts limit=4}}
+{{/match}}
+
+{{!-- CTA Section --}}
+{{> "components/cta"}}
+
+{{!-- Main Content/Post List --}}
+{{> "components/post-list" feed="home" postFeedStyle=@custom.post_feed_style showTitle=true showSidebar=@custom.show_publication_info_sidebar}}

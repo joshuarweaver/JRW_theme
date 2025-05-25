@@ -1,0 +1,64 @@
+{{#get "posts" filter="tag:thoughts-and-perspectives+featured:false" limit="7" include="tags,authors" as |latest_thoughts|}}
+    {{#if latest_thoughts}}
+        <section class="gh-latest-thoughts">
+            <div class="gh-inner">
+                <div class="gh-latest-thoughts-header">
+                    <h2 class="gh-latest-thoughts-title">Latest Thoughts</h2>
+                </div>
+
+                <div class="gh-latest-thoughts-list">
+                    {{#foreach latest_thoughts}}
+                        <article class="gh-latest-thoughts-item {{#if @first}}gh-latest-thoughts-item--hero{{/if}}">
+                            {{#if feature_image}}
+                                <a href="{{url}}" class="gh-latest-thoughts-image-link">
+                                    <img src="{{feature_image}}" alt="{{title}}" class="gh-latest-thoughts-image">
+                                </a>
+                            {{/if}}
+                            <div class="gh-latest-thoughts-content">
+                                <h3 class="gh-latest-thoughts-post-title {{#if @first}}gh-latest-thoughts-post-title--hero{{/if}}">
+                                    <a href="{{url}}" class="gh-latest-thoughts-post-title-link">{{title}}</a>
+                                </h3>
+                                {{#if @first}}
+                                    {{#if excerpt}}
+                                        <p class="gh-latest-thoughts-excerpt">{{excerpt}}</p>
+                                    {{/if}}
+                                {{/if}}
+                                <div class="gh-latest-thoughts-meta">
+                                    {{#if @first}}
+                                        {{#if primary_author}}
+                                            <div class="gh-latest-thoughts-author">
+                                                {{#if primary_author.profile_image}}
+                                                    <a href="{{primary_author.url}}" class="gh-latest-thoughts-author-image-link">
+                                                        <img src="{{primary_author.profile_image}}" alt="{{primary_author.name}}" class="gh-latest-thoughts-author-image">
+                                                    </a>
+                                                {{/if}}
+                                                <a href="{{primary_author.url}}" class="gh-latest-thoughts-author-name">{{primary_author.name}}</a>
+                                            </div>
+                                        {{/if}}
+                                    {{/if}}
+                                    <time class="gh-latest-thoughts-date" datetime="{{date format="YYYY-MM-DD"}}">{{date format="D MMM YYYY"}}</time>
+                                    <span class="gh-latest-thoughts-reading-time">{{reading_time}}</span>
+                                </div>
+                                {{#if @first}}
+                                    <a href="{{url}}" class="gh-latest-thoughts-link">
+                                        Read more
+                                        {{> "icons/arrow-right"}}
+                                    </a>
+                                {{/if}}
+                            </div>
+                        </article>
+                    {{/foreach}}
+                </div>
+                
+                {{!-- View All Button --}}
+                <div class="gh-latest-thoughts-footer">
+                    <a href="/tag/thoughts-and-perspectives" class="gh-button">
+                        <span>View all thoughts</span>
+                        {{> "icons/arrow-right"}}
+                    </a>
+                </div>
+                
+            </div>
+        </section>
+    {{/if}}
+{{/get}} 

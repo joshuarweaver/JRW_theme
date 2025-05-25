@@ -1,0 +1,16 @@
+<div class="gh-socials">
+    {{#if @site.facebook}}
+        <a class="gh-socials-link" href="{{facebook_url}}" target="_blank" rel="noopener noreferrer" aria-label="{{@site.title}} Facebook">
+            <div class="gh-socials-icon-wrapper">
+                {{> "icons/facebook"}}
+            </div>
+        </a>
+    {{/if}}
+    {{#if @site.twitter}}
+        <a class="gh-socials-link" href="{{twitter_url}}" target="_blank" rel="noopener noreferrer" aria-label="{{@site.title}} Twitter">
+            <div class="gh-socials-icon-wrapper">
+                {{> "icons/twitter"}}
+            </div>
+        </a>
+    {{/if}}
+</div> 

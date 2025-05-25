@@ -1,0 +1,97 @@
+{{!-- Membership Section --}}
+<section class="gh-membership">
+    <div class="gh-outer">
+        <div class="gh-inner">
+            <div class="gh-membership-inner">
+                <div class="gh-membership-header">
+                    <h2 class="gh-membership-title">Join the Experts</h2>
+                    <p class="gh-membership-description">Marketing insights with meaning, strategy with soul. Join a community of brand leaders and changemakers who demand more than surface-level takes.</p>
+                </div>
+
+                {{!-- Check if member is logged in --}}
+                {{#if @member}}
+                    <div class="gh-membership-logged-in">
+                        <div class="gh-membership-welcome">
+                            <h3>Welcome back, {{@member.name}}!</h3>
+                            <p>Thanks for being part of our community. Access your member content and manage your subscription below.</p>
+                            <div class="gh-membership-actions">
+                                <a href="#/portal/account" class="gh-button">Manage Account</a>
+                                <a href="/members/" class="gh-button gh-button-secondary">Member Content</a>
+                            </div>
+                        </div>
+                    </div>
+                {{else}}
+                    {{!-- Use Ghost's get helper to fetch tiers --}}
+                    <div class="gh-membership-tiers">
+                        {{#get "tiers" include="monthly_price,yearly_price,benefits" limit="all" as |tiers|}}
+                            {{#foreach tiers}}
+                                <div class="gh-membership-tier {{#if type}}gh-tier-{{type}}{{/if}}">
+                                    <div class="gh-membership-tier-header">
+                                        <h3 class="gh-membership-tier-name">{{name}}</h3>
+                                        {{#if description}}
+                                            <p class="gh-membership-tier-description">{{description}}</p>
+                                        {{/if}}
+                                    </div>
+                                    
+                                    <div class="gh-membership-tier-price">
+                                        {{#if monthly_price}}
+                                            <span class="gh-membership-price">
+                                                <span class="gh-membership-amount">{{price monthly_price}}</span>
+                                                <span class="gh-membership-interval">/month</span>
+                                            </span>
+                                        {{else}}
+                                            <span class="gh-membership-price">
+                                                <span class="gh-membership-amount">Free</span>
+                                            </span>
+                                        {{/if}}
+                                    </div>
+
+                                    {{#if benefits}}
+                                        <ul class="gh-membership-benefits">
+                                            {{#foreach benefits}}
+                                                <li class="gh-membership-benefit">
+                                                    <svg class="gh-membership-check" viewBox="0 0 16 16">
+                                                        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                                    </svg>
+                                                    {{name}}
+                                                </li>
+                                            {{/foreach}}
+                                        </ul>
+                                    {{/if}}
+
+                                    <div class="gh-membership-tier-action">
+                                        {{#if monthly_price}}
+                                            <a href="javascript:" data-portal="signup/{{id}}/monthly" class="gh-button gh-membership-subscribe">Subscribe Monthly</a>
+                                        {{else}}
+                                            <a href="javascript:" data-portal="signup" class="gh-button gh-membership-subscribe">Get Started</a>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                            {{/foreach}}
+                        {{else}}
+                            {{!-- Fallback if no tiers available --}}
+                            <div class="gh-membership-fallback">
+                                <div class="gh-membership-tier">
+                                    <div class="gh-membership-tier-header">
+                                        <h3 class="gh-membership-tier-name">Newsletter</h3>
+                                        <p class="gh-membership-tier-description">Stay updated with the latest insights and strategies.</p>
+                                    </div>
+                                    
+                                    <div class="gh-membership-tier-price">
+                                        <span class="gh-membership-price">
+                                            <span class="gh-membership-amount">Free</span>
+                                        </span>
+                                    </div>
+
+                                    <div class="gh-membership-tier-action">
+                                        <a href="javascript:" data-portal="signup" class="gh-button gh-membership-subscribe">Join Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {{/get}}
+                    </div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</section> 

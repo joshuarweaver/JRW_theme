@@ -1,0 +1,108 @@
+<footer class="gh-footer{{#match @custom.header_and_footer_color "Accent color"}} has-accent-color{{/match}} gh-outer">
+    <div class="gh-footer-inner gh-inner">
+        <div class="gh-footer-main">
+            <div class="gh-footer-branding">
+                <a href="{{@site.url}}" class="gh-footer-logo">
+                    <img class="gh-logo-light" src="{{asset "images/logo-light.png"}}" alt="{{@site.title}}">
+                    <img class="gh-logo-dark" src="{{asset "images/logo-dark.png"}}" alt="{{@site.title}}">
+                </a>
+                <p class="gh-footer-description">{{@site.description}}</p>
+                <div class="gh-footer-socials">
+                    {{> "components/socials"}}
+                </div>
+            </div>
+
+            <div class="gh-footer-nav-columns">
+                <div class="gh-footer-nav-column">
+                    <h3 class="gh-footer-nav-title">Main</h3>
+                    <ul class="gh-footer-nav-list">
+                        <li class="gh-footer-nav-item">
+                            <a href="{{@site.url}}" class="gh-footer-nav-link">Home</a>
+                        </li>
+                        <li class="gh-footer-nav-item">
+                            <a href="{{@site.url}}/about/" class="gh-footer-nav-link">About</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="gh-footer-nav-column">
+                    <h3 class="gh-footer-nav-title">Thoughts & Content</h3>
+                    <ul class="gh-footer-nav-list">
+                        <li class="gh-footer-nav-item gh-footer-nav-item--child">
+                            <a href="/tag/thoughts-and-perspectives/" class="gh-footer-nav-link">Thoughts & Perspectives</a>
+                        </li>
+                        <li class="gh-footer-nav-item gh-footer-nav-item--child">
+                            <a href="/tag/content-strategy/" class="gh-footer-nav-link">Content Strategy</a>
+                        </li>
+                        <li class="gh-footer-nav-item gh-footer-nav-item--child">
+                            <a href="/tag/inclusive-marketing/" class="gh-footer-nav-link">Inclusive Marketing</a>
+                        </li>
+                        <li class="gh-footer-nav-item gh-footer-nav-item--child">
+                            <a href="/tag/team-leadership/" class="gh-footer-nav-link">Team Leadership</a>
+                        </li>
+                        <li class="gh-footer-nav-item gh-footer-nav-item--child">
+                            <a href="/tag/marketing/" class="gh-footer-nav-link">Marketing</a>
+                        </li>
+                        <li class="gh-footer-nav-item gh-footer-nav-item--child">
+                            <a href="/tag/media/" class="gh-footer-nav-link">Media</a>
+                        </li>
+                        <li class="gh-footer-nav-item gh-footer-nav-item--child">
+                            <a href="/tag/news/" class="gh-footer-nav-link">News</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="gh-footer-nav-column">
+                    <h3 class="gh-footer-nav-title">Resources</h3>
+                    <ul class="gh-footer-nav-list">
+                        <li class="gh-footer-nav-item gh-footer-nav-item--child">
+                            <a href="/tag/marketing-glossary/" class="gh-footer-nav-link">Marketing Glossary</a>
+                        </li>
+                        <li class="gh-footer-nav-item gh-footer-nav-item--child">
+                            <a href="/tag/tips-and-tricks/" class="gh-footer-nav-link">Tips and Tricks</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="gh-footer-nav-column">
+                    <h3 class="gh-footer-nav-title">Recent Work</h3>
+                    <ul class="gh-footer-nav-list">
+                        <li class="gh-footer-nav-item gh-footer-nav-item--child">
+                            <a href="{{@site.url}}/campaign-director-at-the-ad-council/" class="gh-footer-nav-link">Campaign Director at The Ad Council</a>
+                        </li>
+                        <li class="gh-footer-nav-item gh-footer-nav-item--child">
+                            <a href="{{@site.url}}/vp-of-marketing-at-the-trevor-project/" class="gh-footer-nav-link">VP of Marketing at The Trevor Project</a>
+                        </li>
+                        <li class="gh-footer-nav-item gh-footer-nav-item--child">
+                            <a href="{{@site.url}}/director-of-media-at-vice-media/" class="gh-footer-nav-link">Director of Media at VICE Media</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="gh-footer-nav-column">
+                    <h3 class="gh-footer-nav-title">Legal</h3>
+                    <ul class="gh-footer-nav-list">
+                        <li class="gh-footer-nav-item">
+                            <a href="{{@site.url}}/privacy/" class="gh-footer-nav-link">Privacy Policy</a>
+                        </li>
+                        <li class="gh-footer-nav-item">
+                            <a href="{{@site.url}}/terms/" class="gh-footer-nav-link">Terms of Service</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="gh-footer-bottom">
+            <p class="gh-footer-copyright">
+                <span>© MMXXV {{@site.title}}. All Rights Reserved. | All images, videos, and other content featured on this site remain the property of their respective owners, and no claim of ownership is made.</span>
+            </p>
+            <p class="gh-footer-powered-by">
+                <span>Built by Josh. Powered by </span>
+                <a href="https://ghost.org" target="_blank" rel="noopener" class="gh-footer-link">
+                    <img src="{{asset 'images/ghost-logo-dark.png'}}" alt="Ghost Logo" class="gh-footer-ghost-logo">
+                </a>
+            </p>
+        </div>
+    </div>
+</footer>
