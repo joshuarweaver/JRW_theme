@@ -15,18 +15,11 @@
 
         <nav class="gh-navigation-menu">
             {{navigation}}
-            {{#unless @site.members_enabled}}
-                {{#match navigationLayout "Stacked"}}
-                    {{> "search-toggle"}}
-                {{/match}}
-            {{/unless}}
         </nav>
 
         <div class="gh-navigation-actions">
             {{#unless @site.members_enabled}}
-                {{^match navigationLayout "Stacked"}}
-                    {{> "search-toggle"}}
-                {{/match}}
+                {{> "search-toggle"}}
             {{else}}
                 {{> "search-toggle"}}
                 <div class="gh-navigation-members">

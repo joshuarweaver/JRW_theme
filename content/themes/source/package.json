@@ -84,23 +84,6 @@
         },
         "card_assets": true,
         "custom": {
-            "hero_title": {
-                "type": "text",
-                "description": "Custom title for the hero section on the homepage"
-            },
-            "hero_description": {
-                "type": "text",
-                "description": "Custom description text for the hero section on the homepage"
-            },
-            "navigation_layout": {
-                "type": "select",
-                "options": [
-                    "Logo in the middle",
-                    "Logo on the left",
-                    "Stacked"
-                ],
-                "default": "Logo in the middle"
-            },
             "site_background_color": {
                 "type": "color",
                 "default": "#ffffff"
@@ -210,6 +193,11 @@
                 "type": "boolean",
                 "default": true,
                 "group": "post"
+            },
+            "notion_integration_token": {
+                "type": "text",
+                "description": "Your Notion API integration token (starts with ntn_) for the Marketing Glossary",
+                "group": "integrations"
             }
         }
     },

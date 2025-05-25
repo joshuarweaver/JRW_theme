@@ -1,0 +1,17 @@
+{
+  "name": "notion-proxy",
+  "version": "1.0.0",
+  "description": "CORS proxy for Notion API integration with Ghost",
+  "main": "notion-proxy.js",
+  "scripts": {
+    "start": "node notion-proxy.js",
+    "dev": "node notion-proxy.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 

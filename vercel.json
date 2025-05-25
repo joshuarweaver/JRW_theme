@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "notion-proxy.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/notion-proxy.js"
+    }
+  ],
+  "functions": {
+    "notion-proxy.js": {
+      "maxDuration": 30
+    }
+  }
+} 

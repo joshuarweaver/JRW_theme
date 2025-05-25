@@ -1,0 +1,17 @@
+name = "notion-proxy"
+main = "worker.js"
+compatibility_date = "2023-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Environment variables can be set here or in the Cloudflare dashboard
+
+# Route configuration for custom domain
+[[routes]]
+pattern = "joshweaver.com/api/*"
+zone_name = "joshweaver.com"
+
+# Route configuration for custom domain (optional)
+# [[routes]]
+# pattern = "your-domain.com/api/*"
+# zone_name = "your-domain.com" 
