@@ -4436,147 +4436,6 @@ body[class*=" gh-font-heading"]:not(.gh-font-heading-fira-sans):not(.gh-font-hea
     }
 }
 
-/* Small Mobile Optimizations */
-@media (max-width: 480px) {
-    .gh-latest-thoughts {
-        padding: 32px 0;
-    }
-    
-    .gh-latest-thoughts-footer {
-        margin-top: 32px;
-    }
-    
-    .gh-latest-thoughts-list {
-        gap: 20px;
-    }
-    
-    .gh-latest-thoughts-item--hero {
-        padding: 20px;
-        gap: 20px;
-    }
-    
-    .gh-latest-thoughts-post-title--hero {
-        font-size: 2rem;
-    }
-    
-    .gh-latest-thoughts-post-title {
-        font-size: 1.6rem;
-    }
-    
-    .gh-latest-thoughts-excerpt {
-        font-size: 1.2rem;
-    }
-    
-    .gh-latest-thoughts-meta {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-    
-    .gh-latest-thoughts-date,
-    .gh-latest-thoughts-reading-time {
-        padding-left: 0 !important;
-    }
-    
-    .gh-latest-thoughts-date::before,
-    .gh-latest-thoughts-reading-time::before {
-        display: none;
-    }
-}
-
-@media (max-width: 400px) {
-    .gh-latest-thoughts-footer {
-        margin-top: 24px;
-    }
-    
-    .gh-latest-thoughts-list {
-        gap: 16px;
-    }
-    
-    .gh-latest-thoughts-item--hero {
-        padding: 16px;
-        gap: 16px;
-    }
-    
-    .gh-latest-thoughts-post-title--hero {
-        font-size: 1.8rem;
-    }
-    
-    .gh-latest-thoughts-post-title {
-        font-size: 1.5rem;
-    }
-    
-    .gh-latest-thoughts-excerpt {
-        font-size: 1.1rem;
-    }
-    
-    .gh-latest-thoughts-meta,
-    .gh-latest-thoughts-date,
-    .gh-latest-thoughts-reading-time,
-    .gh-latest-thoughts-author-name {
-        font-size: 1.3rem;
-    }
-}
-
-@media (max-width: 750px) {
-    .gh-latest-thoughts-post-title--hero {
-        font-size: 2.6rem;
-    }
-    
-    .gh-latest-thoughts-post-title {
-        font-size: 2.2rem;
-    }
-}
-
-/* Mobile Layout: 1-1-1-1-1-1-1 (single column) */
-@media (max-width: 767px) {
-    .gh-latest-thoughts {
-        padding: 48px 0;
-    }
-    
-    .gh-latest-thoughts-list {
-        display: grid;
-        grid-template-areas: 
-            "hero"
-            "item2"
-            "item3"
-            "item4"
-            "item5"
-            "item6"
-            "item7";
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-    
-    .gh-latest-thoughts-item--hero {
-        grid-area: hero;
-        grid-template-columns: 1fr;
-        gap: 24px;
-        padding: 24px;
-    }
-    
-    .gh-latest-thoughts-item--hero .gh-latest-thoughts-image-link {
-        order: 1;
-    }
-    
-    .gh-latest-thoughts-item--hero .gh-latest-thoughts-content {
-        order: 2;
-        gap: 12px;
-    }
-    
-    .gh-latest-thoughts-post-title--hero {
-        font-size: 2.4rem;
-    }
-    
-    .gh-latest-thoughts-post-title {
-        font-size: 1.9rem;
-    }
-    
-    .gh-latest-thoughts-excerpt {
-        font-size: 1.3rem;
-    }
-}
-
 .author-template .gh-article-image {
     margin-top: 0;
     width: 120px;
@@ -6126,5 +5985,360 @@ body .pswp--open {
     visibility: visible;
     opacity: 1;
     pointer-events: auto;
+}
+
+/* 23. Table of Contents
+/* ---------------------------------------------------------- */
+
+.gh-toc-container {
+    position: fixed;
+    top: 50%;
+    left: 32px;
+    transform: translateY(-50%);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.gh-toc-container.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Only show on desktop */
+@media (min-width: 1235px) {
+    .post-template .gh-toc-container {
+        display: block;
+    }
+}
+
+/* TOC Toggle Button - Now minimized since it starts open */
+.gh-toc-toggle {
+    position: absolute;
+    top: 0;
+    right: -50px;
+    z-index: 2;
+}
+
+.gh-toc-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    color: var(--color-primary-text);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:root.has-light-text .gh-toc-toggle-btn {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f1f1f1;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.gh-toc-toggle-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+:root.has-light-text .gh-toc-toggle-btn:hover {
+    background: rgba(30, 41, 59, 1);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.gh-toc-icon {
+    flex-shrink: 0;
+    opacity: 0.8;
+    transition: transform 0.3s ease;
+}
+
+.gh-toc-toggle-btn:hover .gh-toc-icon {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.gh-toc-text {
+    display: none; /* Hidden since we're using icon only when minimized */
+}
+
+/* TOC Navigation Panel - Now larger and open by default */
+.gh-toc-nav {
+    position: relative;
+    width: 320px;
+    max-height: 70vh;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0) scale(1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+:root.has-light-text .gh-toc-nav {
+    background: rgba(30, 41, 59, 0.98);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.gh-toc-nav.is-closed {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-20px) scale(0.95);
+}
+
+/* TOC Header */
+.gh-toc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:root.has-light-text .gh-toc-header {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.gh-toc-title {
+    font-family: var(--gh-font-heading, var(--font-sans));
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-primary-text);
+    margin: 0;
+}
+
+.gh-toc-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    color: var(--color-secondary-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.gh-toc-close:hover {
+    color: var(--color-primary-text);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+:root.has-light-text .gh-toc-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* TOC List */
+.gh-toc-list {
+    flex: 1;
+    margin: 0;
+    padding: 20px 0;
+    list-style: none;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+:root.has-light-text .gh-toc-list {
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.gh-toc-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.gh-toc-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.gh-toc-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+:root.has-light-text .gh-toc-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.gh-toc-item {
+    margin: 0;
+}
+
+.gh-toc-link {
+    display: block;
+    padding: 10px 28px;
+    font-size: 1.5rem;
+    line-height: 1.4;
+    color: var(--color-secondary-text);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.gh-toc-link:hover {
+    color: var(--color-primary-text);
+    background: rgba(0, 0, 0, 0.04);
+    border-left-color: var(--ghost-accent-color, #3366ff);
+}
+
+:root.has-light-text .gh-toc-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.gh-toc-link.is-active {
+    color: var(--ghost-accent-color, #3366ff);
+    background: rgba(var(--ghost-accent-color-rgb, 51, 102, 255), 0.1);
+    border-left-color: var(--ghost-accent-color, #3366ff);
+    font-weight: 500;
+}
+
+/* Nested heading indentation */
+.gh-toc-link[data-level="3"] {
+    padding-left: 44px;
+    font-size: 1.4rem;
+}
+
+.gh-toc-link[data-level="4"] {
+    padding-left: 60px;
+    font-size: 1.4rem;
+}
+
+.gh-toc-link[data-level="5"] {
+    padding-left: 76px;
+    font-size: 1.3rem;
+}
+
+.gh-toc-link[data-level="6"] {
+    padding-left: 92px;
+    font-size: 1.3rem;
+}
+
+/* Progress Bar */
+.gh-toc-progress {
+    height: 4px;
+    background: rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+:root.has-light-text .gh-toc-progress {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.gh-toc-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, 
+        #5e6e81 0%, 
+        rgba(94, 110, 129, 0.8) 100%);
+    transition: width 0.3s ease;
+}
+
+/* Hide TOC when not needed */
+.gh-toc-container.is-hidden {
+    display: none !important;
+}
+
+/* Animations */
+@keyframes tocSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+.gh-toc-container.is-visible {
+    animation: tocSlideIn 0.5s ease-out;
+}
+
+/* Responsive - hide on smaller screens */
+@media (max-width: 1234px) {
+    .gh-toc-container {
+        display: none !important;
+    }
+}
+
+/* Ensure TOC doesn't interfere with content on smaller large screens */
+@media (max-width: 1600px) {
+    .gh-toc-container {
+        left: 20px;
+    }
+    
+    .gh-toc-nav {
+        width: 300px;
+    }
+}
+
+/* Dynamic sizing for narrow screens */
+@media (min-width: 1235px) and (max-width: 1400px) {
+    .gh-toc-container {
+        left: 12px;
+    }
+    
+    .gh-toc-nav {
+        width: 260px;
+    }
+    
+    .gh-toc-header {
+        padding: 18px 22px;
+    }
+    
+    .gh-toc-title {
+        font-size: 1.6rem;
+    }
+    
+    .gh-toc-list {
+        padding: 14px 0;
+    }
+    
+    .gh-toc-link {
+        padding: 7px 22px;
+        font-size: 1.35rem;
+    }
+    
+    .gh-toc-link[data-level="3"] {
+        padding-left: 38px;
+        font-size: 1.25rem;
+    }
+    
+    .gh-toc-link[data-level="4"] {
+        padding-left: 54px;
+        font-size: 1.25rem;
+    }
+    
+    .gh-toc-link[data-level="5"] {
+        padding-left: 70px;
+        font-size: 1.2rem;
+    }
+    
+    .gh-toc-link[data-level="6"] {
+        padding-left: 86px;
+        font-size: 1.2rem;
+    }
 }
 
