@@ -7,6 +7,29 @@
 {{!-- Featured Thought Section --}}
 {{> "components/featured-thought"}}
 
+{{!-- Horizontal Subscribe Section --}}
+{{#unless @member}}
+    <section class="gh-horizontal-subscribe">
+        <div class="gh-outer">
+            <div class="gh-inner">
+                <div class="gh-horizontal-subscribe-inner">
+                    <div class="gh-horizontal-subscribe-content">
+                        <h3 class="gh-horizontal-subscribe-title">Get marketing insights that matter.</h3>
+                        <p class="gh-horizontal-subscribe-description">Join thousands of brand leaders getting strategic insights weekly.</p>
+                    </div>
+                    <form class="gh-form gh-horizontal-subscribe-form" data-members-form>
+                        <input class="gh-form-input gh-horizontal-subscribe-input" id="horizontal-subscribe-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                        <button class="gh-button gh-horizontal-subscribe-button" type="submit" aria-label="Subscribe">
+                            <span>Subscribe</span>
+                        </button>
+                        <p data-members-error class="gh-horizontal-subscribe-error"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{{/unless}}
+
 {{!-- Latest Thoughts Section --}}
 {{> "components/latest-thoughts"}}
 

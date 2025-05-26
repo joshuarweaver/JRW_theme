@@ -111,6 +111,19 @@
                 <div id="glossary-grid" class="glossary-grid">
                     <!-- Terms will be populated here via JavaScript -->
                 </div>
+                
+                <!-- Load More Button -->
+                <div class="load-more-container" style="display: none;">
+                    <button id="load-more-btn" class="load-more-btn">
+                        <span class="load-more-text">Load More Terms</span>
+                        <div class="load-more-spinner" style="display: none;">
+                            <div class="spinner"></div>
+                        </div>
+                    </button>
+                    <p class="load-more-info">
+                        <span id="loaded-count">0</span> of <span id="total-count">0</span> terms loaded
+                    </p>
+                </div>
             </div>
 
             <!-- No Results State -->
@@ -406,6 +419,54 @@
     text-align: center;
 }
 
+/* Load More Section */
+.load-more-container {
+    text-align: center;
+    margin: 3rem 0 2rem;
+    padding: 2rem;
+}
+
+.load-more-btn {
+    background: var(--ghost-accent-color, #3366ff);
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
+
+.load-more-btn:hover {
+    background: #2757e7;
+    transform: translateY(-2px);
+}
+
+.load-more-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.load-more-spinner .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.load-more-info {
+    color: var(--color-secondary-text);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
 /* Modern Square Glossary Grid */
 .glossary-grid {
     display: grid;
@@ -444,8 +505,8 @@
     right: 0;
     height: 4px;
     background: linear-gradient(90deg, 
-        var(--ghost-accent-color, #3366ff) 0%, 
-        rgba(51, 102, 255, 0.7) 100%);
+        #5e6e81 0%, 
+        rgba(94, 110, 129, 0.7) 100%);
     transform: scaleX(0);
     transition: transform 0.3s ease;
     transform-origin: left;
@@ -485,7 +546,6 @@
 
 .term-category {
     display: inline-block;
-    background: var(--ghost-accent-color, #3366ff);
     color: white;
     padding: 4px 10px;
     font-size: 0.75rem;
@@ -493,6 +553,13 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     width: fit-content;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.term-category:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .term-use-case {
@@ -637,6 +704,67 @@
 
 .term-modal-body {
     padding: 3rem;
+}
+
+/* Copy URL Button */
+.copy-url-btn {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--ghost-accent-color, #3366ff);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.copy-url-btn:hover {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+}
+
+.copy-url-btn:active {
+    transform: translateY(0);
+}
+
+.copy-url-btn .copy-success {
+    color: #10b981;
+    font-weight: 600;
+}
+
+:root.has-light-text .copy-url-btn {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+:root.has-light-text .copy-url-btn:hover {
+    background: rgba(59, 130, 246, 0.25);
+}
+
+/* Glossary Links for Article Content */
+.glossary-link {
+    color: var(--ghost-accent-color, #3366ff);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--ghost-accent-color, #3366ff);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.glossary-link:hover {
+    color: #2757e7;
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+}
+
+.glossary-link:hover::after {
+    content: "📚";
+    margin-left: 4px;
+    opacity: 0.7;
 }
 
 /* Responsive Design */
@@ -841,7 +969,16 @@ class MarketingGlossary {
         this.config = window.GLOSSARY_CONFIG || {};
         this.terms = [];
         this.filteredTerms = [];
+        this.displayedTerms = [];
         this.categories = new Set();
+        this.currentPage = 0;
+        this.pageSize = 25; // Terms per load
+        this.totalTerms = 0;
+        this.hasMoreTerms = true;
+        this.isLoading = false;
+        this.nextCursor = null;
+        this.urlMapping = new Map(); // Maps slugs to term IDs
+        this.baseUrl = window.location.pathname; // Store base URL for routing
         
         this.init();
     }
@@ -856,6 +993,8 @@ class MarketingGlossary {
         this.hideConfigNotice();
         await this.fetchTerms();
         this.setupEventListeners();
+        this.setupUrlRouting();
+        this.handleDirectLink();
         this.renderTerms();
     }
     
@@ -915,24 +1054,74 @@ class MarketingGlossary {
         }
         
         try {
+            // Fetch ALL terms using pagination
+            const allResults = await this.fetchAllTermsFromNotion();
+            
+            // Cache the results if enabled
+            if (this.config.ui?.enableCaching !== false) {
+                try {
+                    localStorage.setItem(cacheKey, JSON.stringify({
+                        data: allResults,
+                        timestamp: Date.now()
+                    }));
+                } catch (error) {
+                    console.warn('Failed to cache data:', error);
+                }
+            }
+            
+            this.processTerms(allResults);
+            this.hideLoading();
+            
+        } catch (error) {
+            console.error('Error fetching from Notion:', error);
+            this.showError('Failed to load terms from Notion. Please check your API configuration.');
+        }
+    }
+    
+    async fetchAllTermsFromNotion() {
+        let allResults = [];
+        let hasMore = true;
+        let startCursor = null;
+        
+        console.log('🔄 Starting to fetch ALL terms from Notion...');
+        
+        while (hasMore) {
+            console.log(`📄 Fetching page with cursor: ${startCursor || 'first page'}`);
+            
             let apiUrl, requestOptions;
             
             if (this.config.useLocalProxy && this.config.corsProxy) {
                 // Use local proxy server
                 apiUrl = `${this.config.corsProxy}${this.config.notionDatabaseId}/query`;
+                
+                const requestBody = {
+                    page_size: 100 // Maximum allowed by Notion
+                };
+                
+                if (startCursor) {
+                    requestBody.start_cursor = startCursor;
+                }
+                
                 requestOptions = {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${this.config.notionToken}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        // Remove sorting for now to test basic data fetching
-                    })
+                    body: JSON.stringify(requestBody)
                 };
             } else {
                 // Direct API call (will have CORS issues in browser)
                 apiUrl = `https://api.notion.com/v1/databases/${this.config.notionDatabaseId}/query`;
+                
+                const requestBody = {
+                    page_size: 100
+                };
+                
+                if (startCursor) {
+                    requestBody.start_cursor = startCursor;
+                }
+                
                 requestOptions = {
                     method: 'POST',
                     headers: {
@@ -940,14 +1129,11 @@ class MarketingGlossary {
                         'Content-Type': 'application/json',
                         'Notion-Version': '2022-06-28'
                     },
-                    body: JSON.stringify({
-                        // Remove sorting for now to test basic data fetching
-                    })
+                    body: JSON.stringify(requestBody)
                 };
             }
             
-            console.log('🔄 Final API URL:', apiUrl);
-            console.log('🔄 Request headers:', requestOptions.headers);
+            console.log('🔄 API URL:', apiUrl);
             const response = await fetch(apiUrl, requestOptions);
             
             if (!response.ok) {
@@ -956,25 +1142,24 @@ class MarketingGlossary {
             
             const data = await response.json();
             
-            // Cache the results if enabled
-            if (this.config.ui?.enableCaching !== false) {
-                try {
-                    localStorage.setItem(cacheKey, JSON.stringify({
-                        data: data.results,
-                        timestamp: Date.now()
-                    }));
-                } catch (error) {
-                    console.warn('Failed to cache data:', error);
-                }
+            // Add results to our collection
+            allResults = allResults.concat(data.results);
+            
+            // Check if there are more pages
+            hasMore = data.has_more;
+            startCursor = data.next_cursor;
+            
+            console.log(`✅ Fetched ${data.results.length} terms. Total so far: ${allResults.length}`);
+            
+            if (hasMore) {
+                console.log('📄 More pages available, continuing...');
+                // Small delay to be nice to the API
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
-            
-            this.processTerms(data.results);
-            this.hideLoading();
-            
-        } catch (error) {
-            console.error('Error fetching from Notion:', error);
-            this.showError('Failed to load terms from Notion. Please check your API configuration.');
         }
+        
+        console.log(`🎉 Finished fetching ALL terms! Total: ${allResults.length}`);
+        return allResults;
     }
     
     processTerms(results) {
@@ -984,12 +1169,14 @@ class MarketingGlossary {
             const properties = page.properties;
             
             // Extract term data from Notion properties using configured mapping
+            const categoryData = this.extractSelect(properties[mapping.category] || properties.Category);
             const term = {
                 id: page.id,
                 name: this.extractText(properties[mapping.name] || properties.Name || properties.Term || properties.Title),
                 definition: this.extractText(properties[mapping.definition] || properties.Definition || properties.Description),
-                category: this.extractSelect(properties[mapping.category] || properties.Category),
-                useCase: this.extractText(properties[mapping.useCase] || properties['Use Case'] || properties.UseCase),
+                category: categoryData.name,
+                categoryColor: categoryData.color,
+                useCase: this.extractText(properties[mapping.useCase] || properties['Use Case Example'] || properties['Use Case'] || properties.UseCase),
                 tags: this.extractMultiSelect(properties[mapping.tags] || properties.Tags),
                 url: page.url,
                 lastEdited: page.last_edited_time
@@ -1002,12 +1189,100 @@ class MarketingGlossary {
             return term;
         }).filter(term => term.name); // Filter out terms without names
         
+        // Shuffle terms for variety on each load
+        this.shuffleArray(this.terms);
+        
         this.filteredTerms = [...this.terms];
+        this.totalTerms = this.terms.length;
+        this.currentPage = 0;
+        this.displayedTerms = [];
+        
         this.populateCategories();
         
         console.log('✅ Processed terms:', this.terms.length);
         console.log('📝 Sample term:', this.terms[0]);
         console.log('🏷️ Categories found:', Array.from(this.categories));
+        
+        // Debug: Show category colors (unique categories only)
+        console.log('🎨 Category colors:');
+        const uniqueCategories = new Map();
+        this.terms.forEach(term => {
+            if (term.category && !uniqueCategories.has(term.category)) {
+                const color = this.getCategoryColor(term.category, term.categoryColor);
+                uniqueCategories.set(term.category, {
+                    color: color,
+                    fromNotion: !!term.categoryColor
+                });
+            }
+        });
+        
+        uniqueCategories.forEach((data, category) => {
+            console.log(`  ${category}: ${data.color} ${data.fromNotion ? '(from Notion)' : '(generated)'}`);
+        });
+        
+        // Update total count display
+        const totalCountEl = document.getElementById('total-count');
+        if (totalCountEl) {
+            totalCountEl.textContent = this.totalTerms;
+        }
+        
+        // Build URL mapping for routing
+        this.buildUrlMapping();
+    }
+    
+    shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+    
+    // Generate consistent colors for categories
+    getCategoryColor(categoryName, notionColor = null) {
+        // If Notion provides a color, use it
+        if (notionColor) {
+            const notionColorMap = {
+                'default': '#64748b',
+                'gray': '#6b7280',
+                'brown': '#92400e', 
+                'orange': '#ea580c',
+                'yellow': '#ca8a04',
+                'green': '#059669',
+                'blue': '#2563eb',
+                'purple': '#7c3aed',
+                'pink': '#db2777',
+                'red': '#dc2626'
+            };
+            return notionColorMap[notionColor] || '#64748b';
+        }
+        
+        // Fallback: Generate consistent color based on category name
+        const colors = [
+            '#2563eb', // Blue
+            '#059669', // Green  
+            '#dc2626', // Red
+            '#7c3aed', // Purple
+            '#ea580c', // Orange
+            '#db2777', // Pink
+            '#ca8a04', // Yellow
+            '#0891b2', // Cyan
+            '#7c2d12', // Brown
+            '#4338ca', // Indigo
+            '#be123c', // Rose
+            '#0d9488'  // Teal
+        ];
+        
+        // Create a simple hash from the category name
+        let hash = 0;
+        for (let i = 0; i < categoryName.length; i++) {
+            const char = categoryName.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        
+        // Use hash to select a color consistently
+        const colorIndex = Math.abs(hash) % colors.length;
+        return colors[colorIndex];
     }
     
     extractText(property) {
@@ -1023,7 +1298,12 @@ class MarketingGlossary {
     }
     
     extractSelect(property) {
-        return property?.select?.name || '';
+        if (!property?.select) return { name: '', color: null };
+        
+        return {
+            name: property.select.name || '',
+            color: property.select.color || null
+        };
     }
     
     extractMultiSelect(property) {
@@ -1108,6 +1388,15 @@ class MarketingGlossary {
             });
         }
         
+        // Load More button
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', () => {
+                console.log('📄 Load More button clicked');
+                this.loadMoreTerms();
+            });
+        }
+        
         console.log('🎉 Event listeners setup complete');
     }
     
@@ -1141,6 +1430,13 @@ class MarketingGlossary {
             return matchesSearch && matchesCategory && matchesLetter;
         });
         
+        // Shuffle filtered results for variety
+        this.shuffleArray(this.filteredTerms);
+        
+        // Reset pagination
+        this.currentPage = 0;
+        this.displayedTerms = [];
+        
         console.log('  Filtered terms:', this.filteredTerms.length);
         
         this.renderTerms();
@@ -1150,24 +1446,38 @@ class MarketingGlossary {
         const grid = document.getElementById('glossary-grid');
         const resultsCount = document.getElementById('results-count');
         const noResults = document.getElementById('no-results');
+        const loadMoreContainer = document.querySelector('.load-more-container');
+        const loadedCountEl = document.getElementById('loaded-count');
         
         resultsCount.textContent = `${this.filteredTerms.length} ${this.filteredTerms.length === 1 ? 'term' : 'terms'} found`;
         
         if (this.filteredTerms.length === 0) {
             grid.innerHTML = '';
             noResults.style.display = 'block';
+            loadMoreContainer.style.display = 'none';
             return;
         }
         
         noResults.style.display = 'none';
         
+        // If this is a fresh render (not load more), clear the grid
+        if (this.currentPage === 0) {
+            grid.innerHTML = '';
+            this.displayedTerms = [];
+        }
+        
+        // Calculate which terms to show
+        const startIndex = this.currentPage * this.pageSize;
+        const endIndex = Math.min(startIndex + this.pageSize, this.filteredTerms.length);
+        const termsToAdd = this.filteredTerms.slice(startIndex, endIndex);
+        
+        // Add new terms to displayed terms
+        this.displayedTerms = this.displayedTerms.concat(termsToAdd);
+        
         const previewLength = this.config.ui?.previewLength || 120;
         
-        // Clear existing content
-        grid.innerHTML = '';
-        
-        // Create cards with staggered animation
-        this.filteredTerms.forEach((term, index) => {
+        // Create cards with staggered animation for new terms only
+        termsToAdd.forEach((term, index) => {
             const card = document.createElement('article');
             card.className = 'glossary-term';
             card.style.opacity = '0';
@@ -1176,10 +1486,7 @@ class MarketingGlossary {
             card.style.transitionDelay = `${index * 0.1}s`;
             
             const categoryBadge = term.category ? 
-                `<span class="term-category">${this.escapeHtml(term.category)}</span>` : '';
-            
-            const useCaseBadge = term.useCase ? 
-                `<span class="term-use-case">${this.escapeHtml(term.useCase)}</span>` : '';
+                `<span class="term-category" style="background: ${this.getCategoryColor(term.category, term.categoryColor)}; margin-right: 8px;">${this.escapeHtml(term.category)}</span>` : '';
             
             const definition = this.truncateText(this.escapeHtml(term.definition), previewLength);
             
@@ -1187,10 +1494,10 @@ class MarketingGlossary {
                 <div class="gh-skill-content">
                     <h3 class="term-title">${this.escapeHtml(term.name)}</h3>
                     <div class="term-badges">
-                        ${categoryBadge}${useCaseBadge}
+                        ${categoryBadge}
                     </div>
                     <p class="term-definition">${definition}</p>
-                    <a href="#" class="term-read-more" onclick="event.preventDefault();">
+                    <a href="#" class="term-read-more" data-term-id="${term.id}">
                         Read full definition
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M5 12h14"></path>
@@ -1200,19 +1507,21 @@ class MarketingGlossary {
                 </div>
             `;
             
-            // Add click handler for modal
+            // Add click handler for modal (entire card except CTA)
             card.addEventListener('click', (e) => {
-                if (e.target.tagName !== 'A' && !e.target.closest('a')) {
-                    this.showTermModal(term.id);
+                // Don't trigger modal if clicking the CTA button
+                if (e.target.closest('.term-read-more')) {
+                    return;
                 }
+                this.showTermModal(term.id);
             });
             
-            // Add hover sound effect (optional)
-            card.addEventListener('mouseenter', () => {
-                if (this.config.ui?.enableSoundEffects) {
-                    // Play subtle hover sound if enabled
-                    this.playHoverSound();
-                }
+            // Add specific click handler for CTA
+            const ctaButton = card.querySelector('.term-read-more');
+            ctaButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.showTermModal(term.id);
             });
             
             grid.appendChild(card);
@@ -1224,11 +1533,60 @@ class MarketingGlossary {
             }, 50 + (index * 100));
         });
         
-        // Add search result highlighting if there's a search term
-        const searchTerm = document.getElementById('glossary-search').value.toLowerCase();
-        if (searchTerm) {
-            this.highlightSearchTerms(searchTerm);
+        // Update pagination info
+        this.currentPage++;
+        const hasMore = this.displayedTerms.length < this.filteredTerms.length;
+        
+        // Update load more button state
+        if (hasMore) {
+            loadMoreContainer.style.display = 'block';
+            document.getElementById('load-more-btn').disabled = false;
+            document.querySelector('.load-more-text').textContent = 'Load More Terms';
+        } else {
+            loadMoreContainer.style.display = this.displayedTerms.length > this.pageSize ? 'block' : 'none';
+            if (loadMoreContainer.style.display === 'block') {
+                document.getElementById('load-more-btn').disabled = true;
+                document.querySelector('.load-more-text').textContent = 'All Terms Loaded';
+            }
         }
+        
+        // Update loaded count
+        if (loadedCountEl) {
+            loadedCountEl.textContent = this.displayedTerms.length;
+        }
+        
+        // Add search result highlighting if there's a search term
+        const searchInput = document.getElementById('glossary-search');
+        if (searchInput) {
+            const searchTerm = searchInput.value.toLowerCase();
+            if (searchTerm) {
+                this.highlightSearchTerms(searchTerm);
+            }
+        }
+    }
+    
+    loadMoreTerms() {
+        if (this.isLoading) return;
+        
+        this.isLoading = true;
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        const loadMoreText = document.querySelector('.load-more-text');
+        const loadMoreSpinner = document.querySelector('.load-more-spinner');
+        
+        // Show loading state
+        loadMoreBtn.disabled = true;
+        loadMoreText.style.display = 'none';
+        loadMoreSpinner.style.display = 'block';
+        
+        // Simulate a brief loading delay for better UX
+        setTimeout(() => {
+            this.renderTerms();
+            
+            // Hide loading state
+            this.isLoading = false;
+            loadMoreText.style.display = 'block';
+            loadMoreSpinner.style.display = 'none';
+        }, 500);
     }
     
     highlightSearchTerms(searchTerm) {
@@ -1257,73 +1615,113 @@ class MarketingGlossary {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
     
-    playHoverSound() {
-        // Simple hover sound effect (very subtle)
-        if (typeof AudioContext !== 'undefined') {
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-                oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
-                
-                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.01, audioContext.currentTime + 0.01);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
-                
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.1);
-            } catch (error) {
-                // Silently fail if audio context not available
-            }
-        }
-    }
-    
     showTermModal(termId) {
         if (this.config.ui?.enableModal === false) return;
         
         const term = this.terms.find(t => t.id === termId);
         if (!term) return;
         
+        // Update URL for this term
+        this.updateUrlForTerm(term);
+        
         const modal = document.getElementById('term-modal');
         const body = modal.querySelector('.term-modal-body');
         
         const categoryBadge = term.category ? 
-            `<span class="term-category" style="margin-bottom: 1.5rem; display: inline-block; margin-right: 8px;">${this.escapeHtml(term.category)}</span>` : '';
-        
-        const useCaseBadge = term.useCase ? 
-            `<span class="term-use-case" style="margin-bottom: 1.5rem; display: inline-block;">${this.escapeHtml(term.useCase)}</span>` : '';
+            `<span class="term-category" style="background: ${this.getCategoryColor(term.category, term.categoryColor)}; margin-right: 8px;">${this.escapeHtml(term.category)}</span>` : '';
         
         body.innerHTML = `
-            <h2 style="color: var(--glossary-primary); margin-bottom: 1rem; font-size: 2rem;">${this.escapeHtml(term.name)}</h2>
-            <div style="margin-bottom: 1.5rem;">
-                ${categoryBadge}${useCaseBadge}
-            </div>
-            <div style="line-height: 1.8; font-size: 1.1rem; color: var(--glossary-text);">
-                ${this.formatDefinition(term.definition)}
-            </div>
-            ${term.tags.length > 0 ? `
-                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--glossary-border);">
-                    <strong style="color: var(--glossary-text); margin-bottom: 0.5rem; display: block;">Related Tags:</strong>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                        ${term.tags.map(tag => `<span style="background: var(--glossary-secondary); padding: 4px 8px; font-size: 0.9rem;">${this.escapeHtml(tag)}</span>`).join('')}
-                    </div>
+            <header style="margin-bottom: 2rem;">
+                <h2 style="color: var(--glossary-primary); margin-bottom: 1rem; font-size: 2rem;">${this.escapeHtml(term.name)}</h2>
+                <div style="margin-bottom: 1.5rem;" role="group" aria-label="Term categories">
+                    ${categoryBadge}
                 </div>
-            ` : ''}
+                <div style="margin-bottom: 1.5rem;">
+                    <button id="copy-term-url" class="copy-url-btn" data-url="${this.getTermUrl(term)}" title="Copy direct link to this term">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.71"></path>
+                        </svg>
+                        <span class="copy-text">Copy Link</span>
+                        <span class="copy-success" style="display: none;">Copied!</span>
+                    </button>
+                </div>
+            </header>
+            <main>
+                <section style="margin-bottom: 2rem;" aria-labelledby="definition-heading">
+                    <h3 id="definition-heading" style="color: var(--glossary-text); margin-bottom: 0.75rem; font-size: 1.3rem; font-weight: 600;">Definition:</h3>
+                    <div style="line-height: 1.8; font-size: 1.1rem; color: var(--glossary-text);">
+                        ${this.formatDefinition(term.definition)}
+                    </div>
+                </section>
+                ${term.useCase ? `
+                    <section style="margin-bottom: 2rem;" aria-labelledby="usecase-heading">
+                        <h3 id="usecase-heading" style="color: var(--glossary-text); margin-bottom: 0.75rem; font-size: 1.3rem; font-weight: 600;">Use Case Example:</h3>
+                        <div style="line-height: 1.8; font-size: 1.1rem; color: var(--glossary-text); background: rgba(59, 130, 246, 0.05); padding: 1.5rem; border-left: 4px solid var(--ghost-accent-color, #3366ff);">
+                            ${this.formatDefinition(term.useCase)}
+                        </div>
+                    </section>
+                ` : ''}
+                ${term.tags.length > 0 ? `
+                    <section style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--glossary-border);" aria-labelledby="tags-heading">
+                        <h3 id="tags-heading" style="color: var(--glossary-text); margin-bottom: 0.75rem; font-size: 1.3rem; font-weight: 600;">Related Tags:</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;" role="list">
+                            ${term.tags.map(tag => `<span role="listitem" style="background: var(--glossary-secondary); padding: 4px 8px; font-size: 0.9rem;">${this.escapeHtml(tag)}</span>`).join('')}
+                        </div>
+                    </section>
+                ` : ''}
+            </main>
         `;
         
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        
+        // Set up copy URL functionality
+        const copyBtn = modal.querySelector('#copy-term-url');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', async () => {
+                const url = copyBtn.dataset.url;
+                const copyText = copyBtn.querySelector('.copy-text');
+                const copySuccess = copyBtn.querySelector('.copy-success');
+                
+                try {
+                    await navigator.clipboard.writeText(url);
+                    copyText.style.display = 'none';
+                    copySuccess.style.display = 'inline';
+                    
+                    setTimeout(() => {
+                        copyText.style.display = 'inline';
+                        copySuccess.style.display = 'none';
+                    }, 2000);
+                } catch (error) {
+                    console.error('Failed to copy URL:', error);
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = url;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    copyText.style.display = 'none';
+                    copySuccess.style.display = 'inline';
+                    
+                    setTimeout(() => {
+                        copyText.style.display = 'inline';
+                        copySuccess.style.display = 'none';
+                    }, 2000);
+                }
+            });
+        }
     }
     
     closeModal() {
         const modal = document.getElementById('term-modal');
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
+        
+        // Reset URL to base glossary page
+        this.resetUrl();
     }
     
     formatDefinition(text) {
@@ -1367,6 +1765,115 @@ class MarketingGlossary {
     hideError() {
         document.getElementById('error-state').style.display = 'none';
     }
+    
+    // Generate URL-friendly slug from term name
+    generateSlug(termName) {
+        return termName
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+            .replace(/\s+/g, '-') // Replace spaces with hyphens
+            .replace(/-+/g, '-') // Remove multiple consecutive hyphens
+            .trim();
+    }
+    
+    // Set up URL routing for individual terms
+    setupUrlRouting() {
+        // Using hash-based routing (e.g., /marketing-glossary#digital-activism)
+        // This avoids 404s since the base page always exists and hash changes
+        // are handled client-side without server requests
+        
+        // Handle browser back/forward navigation
+        window.addEventListener('popstate', (e) => {
+            this.handleHashChange();
+        });
+        
+        // Handle hash changes
+        window.addEventListener('hashchange', (e) => {
+            this.handleHashChange();
+        });
+        
+        // Set up initial URL mapping when terms are loaded
+        this.buildUrlMapping();
+    }
+    
+    // Handle hash changes for routing
+    handleHashChange() {
+        const hash = window.location.hash.substring(1); // Remove the #
+        if (hash && this.urlMapping.has(hash)) {
+            this.openTermBySlug(hash);
+        } else if (!hash) {
+            this.closeModal();
+        }
+    }
+    
+    // Build mapping between URL slugs and term IDs
+    buildUrlMapping() {
+        this.urlMapping.clear();
+        this.terms.forEach(term => {
+            const slug = this.generateSlug(term.name);
+            this.urlMapping.set(slug, term.id);
+            // Also store the slug in the term object
+            term.slug = slug;
+        });
+        
+        console.log('🔗 URL mapping built:', Array.from(this.urlMapping.keys()).slice(0, 5), '...');
+    }
+    
+    // Handle direct links to terms
+    handleDirectLink() {
+        const hash = window.location.hash.substring(1); // Remove the #
+        const currentSearch = window.location.search;
+        
+        // Check if URL has a term hash (e.g., /marketing-glossary#digital-activism)
+        if (hash && this.urlMapping.has(hash)) {
+            // Open term from URL hash
+            setTimeout(() => this.openTermBySlug(hash), 500);
+        } else {
+            // Also check for ?term= parameter for backward compatibility
+            const urlParams = new URLSearchParams(currentSearch);
+            const termParam = urlParams.get('term');
+            
+            if (termParam && this.urlMapping.has(termParam)) {
+                // Open term from URL parameter and update hash
+                setTimeout(() => {
+                    this.openTermBySlug(termParam);
+                    window.location.hash = termParam;
+                }, 500);
+            }
+        }
+    }
+    
+    // Open term by its URL slug
+    openTermBySlug(slug) {
+        const termId = this.urlMapping.get(slug);
+        if (termId) {
+            this.showTermModal(termId);
+        }
+    }
+    
+    // Update URL when term is opened
+    updateUrlForTerm(term) {
+        const title = `${term.name} - Marketing Glossary`;
+        
+        // Update URL hash for this term
+        window.location.hash = term.slug;
+        
+        // Update page title
+        document.title = title;
+    }
+    
+    // Reset URL when modal is closed
+    resetUrl() {
+        const title = 'Marketing Glossary';
+        window.location.hash = '';
+        document.title = title;
+    }
+    
+    // Get the full URL for a term (for sharing/copying)
+    getTermUrl(term) {
+        const baseUrl = window.location.origin + this.baseUrl;
+        return `${baseUrl}#${term.slug}`;
+    }
 }
 
 // Initialize the glossary when the page loads
@@ -1385,6 +1892,45 @@ document.addEventListener('DOMContentLoaded', () => {
         window.glossary = new MarketingGlossary();
     }, 200);
 });
+
+// Utility functions for article linking
+window.getGlossaryTermUrl = function(termName) {
+    if (!window.glossary || !window.glossary.urlMapping) {
+        console.warn('Glossary not initialized yet');
+        return null;
+    }
+    
+    const slug = window.glossary.generateSlug(termName);
+    const baseUrl = window.location.origin + window.glossary.baseUrl;
+    return `${baseUrl}#${slug}`;
+};
+
+window.createGlossaryLink = function(termName, linkText = null) {
+    const url = window.getGlossaryTermUrl(termName);
+    if (!url) return null;
+    
+    const text = linkText || termName;
+    return `<a href="${url}" class="glossary-link" title="View definition: ${termName}">${text}</a>`;
+};
+
+// Function to show available term slugs for linking
+window.showGlossaryTerms = function() {
+    if (!window.glossary || !window.glossary.urlMapping) {
+        console.warn('Glossary not initialized yet');
+        return;
+    }
+    
+    console.log('📚 Available glossary terms for linking:');
+    const terms = Array.from(window.glossary.urlMapping.keys()).sort();
+    terms.forEach(slug => {
+        const url = `${window.location.origin}${window.glossary.baseUrl}#${slug}`;
+        console.log(`  ${slug} → ${url}`);
+    });
+    
+    console.log(`\n💡 Usage examples:`);
+    console.log(`  getGlossaryTermUrl("Digital Marketing") → URL with hash`);
+    console.log(`  createGlossaryLink("SEO", "Search Engine Optimization") → HTML link`);
+};
 
 // Backward compatibility functions
 window.setNotionConfig = function(databaseId, token) {

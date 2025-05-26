@@ -46,6 +46,25 @@
 
         </header>
 
+        {{!-- Horizontal Subscribe Section --}}
+        {{#unless @member}}
+            <section class="gh-horizontal-subscribe gh-canvas" style="margin-bottom: 60px;">
+                <div class="gh-horizontal-subscribe-inner" style="grid-column: wide;">
+                    <div class="gh-horizontal-subscribe-content">
+                        <h3 class="gh-horizontal-subscribe-title">Get marketing insights that matter.</h3>
+                        <p class="gh-horizontal-subscribe-description">Join thousands of brand leaders getting strategic insights weekly.</p>
+                    </div>
+                    <form class="gh-form gh-horizontal-subscribe-form" data-members-form>
+                        <input class="gh-form-input gh-horizontal-subscribe-input" id="post-horizontal-subscribe-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                        <button class="gh-button gh-horizontal-subscribe-button" type="submit" aria-label="Subscribe">
+                            <span>Subscribe</span>
+                        </button>
+                        <p data-members-error class="gh-horizontal-subscribe-error"></p>
+                    </form>
+                </div>
+            </section>
+        {{/unless}}
+
         <section class="gh-content gh-canvas is-body{{#if @custom.enable_drop_caps_on_posts}} drop-cap{{/if}}">
             {{content}}
         </section>
@@ -81,3 +100,24 @@
         {{/if}}
     {{/get}}
 {{/if}}
+
+{{!-- Join the Experts CTA Section --}}
+{{#unless @member}}
+    <section style="display: block !important; background: var(--color-lighter-gray); padding: 100px 0; margin: 60px 0 0 0; width: 100vw; margin-left: calc(-50vw + 50%);">
+        <div style="max-width: 1200px; margin: 0 auto; text-align: center; padding: 0 40px;">
+            <div style="max-width: 800px; margin: 0 auto 48px;">
+                <h2 style="font-size: 4.8rem; font-weight: 700; margin-bottom: 20px; line-height: 1.1;">Join the Experts</h2>
+                <p style="font-size: 2rem; line-height: 1.4; opacity: 0.9;">Marketing insights with meaning, strategy with soul. Join a community of brand leaders and changemakers who demand more than surface-level takes.</p>
+            </div>
+            <div style="max-width: 500px; margin: 0 auto;">
+                <form class="gh-form" data-members-form style="display: flex; gap: 0; width: 100%;">
+                    <input class="gh-form-input" id="post-cta-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email style="flex: 1; padding: 16px 20px; border: 1px solid #e1e5e9; border-radius: 0; font-size: 1.6rem; height: 56px; box-sizing: border-box; border-right: none; position: static;">
+                    <button class="gh-button" type="submit" aria-label="Subscribe" style="padding: 16px 32px; background: var(--ghost-accent-color); color: white; border: 1px solid var(--ghost-accent-color); border-radius: 0; cursor: pointer; font-size: 1.6rem; font-weight: 600; height: 56px; box-sizing: border-box; width: auto; position: static;">
+                        <span>Subscribe</span>
+                    </button>
+                </form>
+                <p data-members-error style="color: red; margin-top: 8px; text-align: left;"></p>
+            </div>
+        </div>
+    </section>
+{{/unless}}

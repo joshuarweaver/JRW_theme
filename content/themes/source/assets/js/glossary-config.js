@@ -24,6 +24,7 @@ window.GLOSSARY_CONFIG = {
         name: 'Term',        // The title/name field in your database
         definition: 'Definition',
         category: 'Category',
+        useCase: 'Use Case Example',  // Updated to match actual field name
         tags: 'Tags'
     },
     

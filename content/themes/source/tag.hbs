@@ -4,19 +4,138 @@
 <main class="gh-main gh-outer">
 
     {{#tag}}
-        <section class="gh-archive{{#if feature_image}} has-image{{/if}}{{#if @custom.show_publication_info_sidebar}} has-sidebar{{/if}} gh-inner">
-            <div class="gh-archive-inner">
-                <header class="gh-archive-wrapper">
-                    <h1 class="gh-article-title is-title">{{name}}</h1>
-                    {{#if description}}
-                        <p class="gh-article-excerpt">{{description}}</p>
+        {{!-- Tag Hero Section with Feature Image and Title Overlay - Full Bleed --}}
+        <section class="gh-featured-thought" style="width: 100vw; margin-left: calc(-50vw + 50%); position: relative; min-height: 40vh;">
+            <article class="gh-featured-thought-card" style="min-height: 40vh;">
+                <div class="gh-featured-thought-background">
+                    {{#if feature_image}}
+                        <div class="gh-featured-thought-image-container">
+                            <img class="gh-featured-thought-image" src="{{img_url feature_image size="xxl"}}" alt="{{name}}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
                     {{/if}}
-                </header>
-                {{> "feature-image"}}
-            </div>
+                    <div class="gh-featured-thought-overlay"></div>
+                </div>
+                
+                <div class="gh-featured-thought-wrapper">
+                    <div class="gh-inner">
+                        <div class="gh-featured-thought-content">
+                            <div class="gh-featured-thought-tag">
+                                <span class="gh-featured-thought-featured-badge">
+                                    {{> "icons/lightning"}}
+                                    <span>Tag</span>
+                                </span>
+                            </div>
+                            
+                            <h1 class="gh-featured-thought-title">
+                                {{name}}
+                            </h1>
+                            
+                            {{#if description}}
+                                <p class="gh-featured-thought-excerpt">{{description}}</p>
+                            {{/if}}
+                            
+                            <div class="gh-featured-thought-meta">
+                                <span class="gh-featured-thought-reading-time">{{plural count_posts empty='No posts' singular='% post' plural='% posts'}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
         </section>
+
+        {{!-- Featured Post Section (First post in tag) - Full Bleed --}}
+        {{#get "posts" filter="tag:{{slug}}" limit="1" include="tags,authors" as |featured_post|}}
+            {{#if featured_post}}
+                <section class="gh-featured-thought" style="width: 100vw; margin-left: calc(-50vw + 50%); position: relative;">
+                    {{#foreach featured_post}}
+                        <article class="gh-featured-thought-card">
+                            <div class="gh-featured-thought-background">
+                                {{#if feature_image}}
+                                    <div class="gh-featured-thought-image-container">
+                                        <img class="gh-featured-thought-image" src="{{feature_image}}" alt="{{title}}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
+                                {{/if}}
+                                <div class="gh-featured-thought-overlay"></div>
+                            </div>
+                            
+                            <div class="gh-featured-thought-wrapper">
+                                <div class="gh-inner">
+                                    <div class="gh-featured-thought-content">
+                                        <div class="gh-featured-thought-tag">
+                                            {{#if featured}}
+                                                <span class="gh-featured-thought-featured-badge">
+                                                    {{> "icons/lightning"}}
+                                                    <span>Featured</span>
+                                                </span>
+                                            {{/if}}
+                                            {{#primary_tag}}
+                                                <a href="{{url}}" class="gh-featured-thought-tag-link">{{name}}</a>
+                                            {{/primary_tag}}
+                                        </div>
+                                        
+                                        <h2 class="gh-featured-thought-title">
+                                            <a href="{{url}}" class="gh-featured-thought-title-link">
+                                                {{title}}
+                                            </a>
+                                        </h2>
+                                        
+                                        {{#if excerpt}}
+                                            <p class="gh-featured-thought-excerpt">{{excerpt}}</p>
+                                        {{/if}}
+                                        
+                                        <div class="gh-featured-thought-meta">
+                                            {{#if primary_author}}
+                                                <div class="gh-featured-thought-author">
+                                                    {{#if primary_author.profile_image}}
+                                                        <a href="{{primary_author.url}}" class="gh-featured-thought-author-image-link">
+                                                            <img src="{{primary_author.profile_image}}" alt="{{primary_author.name}}" class="gh-featured-thought-author-image">
+                                                        </a>
+                                                    {{/if}}
+                                                    <a href="{{primary_author.url}}" class="gh-featured-thought-author-name">{{primary_author.name}}</a>
+                                                </div>
+                                            {{/if}}
+                                            <time class="gh-featured-thought-date" datetime="{{date format="YYYY-MM-DD"}}">{{date format="D MMM YYYY"}}</time>
+                                            <span class="gh-featured-thought-reading-time">{{reading_time}}</span>
+                                        </div>
+                                        
+                                        <a href="{{url}}" class="gh-featured-thought-button gh-button">
+                                            <span>Read Article</span>
+                                            {{> "icons/arrow-right"}}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    {{/foreach}}
+                </section>
+            {{/if}}
+        {{/get}}
     {{/tag}}
 
-    {{> "components/post-list" feed="archive" postFeedStyle=@custom.post_feed_style showTitle=false showSidebar=@custom.show_publication_info_sidebar}}
+    {{!-- Blog Roll - Using the original post-list component --}}
+    <div style="margin: 120px 0;">
+        {{> "components/post-list" feed="archive" postFeedStyle=@custom.post_feed_style showTitle=false showSidebar=@custom.show_publication_info_sidebar}}
+    </div>
+
+    {{!-- Join the Experts CTA Section --}}
+    {{#unless @member}}
+        <section style="display: block !important; background: var(--color-lighter-gray); padding: 100px 0; margin: 60px 0 0 0; width: 100vw; margin-left: calc(-50vw + 50%);">
+            <div style="max-width: 1200px; margin: 0 auto; text-align: center; padding: 0 40px;">
+                <div style="max-width: 800px; margin: 0 auto 48px;">
+                    <h2 style="font-size: 4.8rem; font-weight: 700; margin-bottom: 20px; line-height: 1.1;">Join the Experts</h2>
+                    <p style="font-size: 2rem; line-height: 1.4; opacity: 0.9;">Marketing insights with meaning, strategy with soul. Join a community of brand leaders and changemakers who demand more than surface-level takes.</p>
+                </div>
+                <div style="max-width: 500px; margin: 0 auto;">
+                    <form class="gh-form" data-members-form style="display: flex; gap: 0; width: 100%;">
+                        <input class="gh-form-input" id="tag-cta-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email style="flex: 1; padding: 16px 20px; border: 1px solid #e1e5e9; border-radius: 0; font-size: 1.6rem; height: 56px; box-sizing: border-box; border-right: none; position: static;">
+                        <button class="gh-button" type="submit" aria-label="Subscribe" style="padding: 16px 32px; background: var(--ghost-accent-color); color: white; border: 1px solid var(--ghost-accent-color); border-radius: 0; cursor: pointer; font-size: 1.6rem; font-weight: 600; height: 56px; box-sizing: border-box; width: auto; position: static;">
+                            <span>Subscribe</span>
+                        </button>
+                    </form>
+                    <p data-members-error style="color: red; margin-top: 8px; text-align: left;"></p>
+                </div>
+            </div>
+        </section>
+    {{/unless}}
 
 </main>

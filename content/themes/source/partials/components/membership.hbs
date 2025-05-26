@@ -63,7 +63,14 @@
                                         {{#if monthly_price}}
                                             <a href="javascript:" data-portal="signup/{{id}}/monthly" class="gh-button gh-membership-subscribe">Subscribe Monthly</a>
                                         {{else}}
-                                            <a href="javascript:" data-portal="signup" class="gh-button gh-membership-subscribe">Get Started</a>
+                                            {{!-- Free tier with email subscription form --}}
+                                            <form class="gh-form gh-membership-form" data-members-form>
+                                                <input class="gh-form-input gh-membership-email-input" id="membership-email-{{@index}}" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                                                <button class="gh-button gh-membership-subscribe" type="submit" aria-label="Subscribe">
+                                                    <span>Subscribe</span>
+                                                </button>
+                                                <p data-members-error class="gh-membership-error"></p>
+                                            </form>
                                         {{/if}}
                                     </div>
                                 </div>
@@ -84,7 +91,13 @@
                                     </div>
 
                                     <div class="gh-membership-tier-action">
-                                        <a href="javascript:" data-portal="signup" class="gh-button gh-membership-subscribe">Join Now</a>
+                                        <form class="gh-form gh-membership-form" data-members-form>
+                                            <input class="gh-form-input gh-membership-email-input" id="membership-fallback-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                                            <button class="gh-button gh-membership-subscribe" type="submit" aria-label="Subscribe">
+                                                <span>Join Now</span>
+                                            </button>
+                                            <p data-members-error class="gh-membership-error"></p>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
