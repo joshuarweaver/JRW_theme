@@ -21,8 +21,11 @@
                         <input class="gh-form-input gh-horizontal-subscribe-input" id="horizontal-subscribe-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
                         <button class="gh-button gh-horizontal-subscribe-button" type="submit" aria-label="Subscribe">
                             <span>Subscribe</span>
+                            {{> "icons/loader"}}
+                            {{> "icons/checkmark"}}
                         </button>
                         <p data-members-error class="gh-horizontal-subscribe-error"></p>
+                        <p data-members-success class="gh-horizontal-subscribe-success" style="display: none;">Great! Check your inbox and click the link to confirm your subscription.</p>
                     </form>
                 </div>
             </div>

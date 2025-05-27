@@ -58,8 +58,11 @@
                         <input class="gh-form-input gh-horizontal-subscribe-input" id="post-horizontal-subscribe-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
                         <button class="gh-button gh-horizontal-subscribe-button" type="submit" aria-label="Subscribe">
                             <span>Subscribe</span>
+                            {{> "icons/loader"}}
+                            {{> "icons/checkmark"}}
                         </button>
                         <p data-members-error class="gh-horizontal-subscribe-error"></p>
+                        <p data-members-success class="gh-horizontal-subscribe-success" style="display: none;">Great! Check your inbox and click the link to confirm your subscription.</p>
                     </form>
                 </div>
             </section>
@@ -114,9 +117,12 @@
                     <input class="gh-form-input" id="post-cta-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email style="flex: 1; padding: 16px 20px; border: 1px solid #e1e5e9; border-radius: 0; font-size: 1.6rem; height: 56px; box-sizing: border-box; border-right: none; position: static;">
                     <button class="gh-button" type="submit" aria-label="Subscribe" style="padding: 16px 32px; background: var(--ghost-accent-color); color: white; border: 1px solid var(--ghost-accent-color); border-radius: 0; cursor: pointer; font-size: 1.6rem; font-weight: 600; height: 56px; box-sizing: border-box; width: auto; position: static;">
                         <span>Subscribe</span>
+                        {{> "icons/loader"}}
+                        {{> "icons/checkmark"}}
                     </button>
                 </form>
                 <p data-members-error style="color: red; margin-top: 8px; text-align: left;"></p>
+                <p data-members-success style="color: green; margin-top: 8px; text-align: left; display: none;">Great! Check your inbox and click the link to confirm your subscription.</p>
             </div>
         </div>
     </section>

@@ -339,6 +339,25 @@ body[class*=" gh-font-heading"]:not(.gh-font-heading-fira-sans):not(.gh-font-hea
     line-height: 1.4;
 }
 
+.gh-form [data-members-success] {
+    position: absolute;
+    top: 100%;
+    margin-top: 10px;
+    width: 100%;
+    font-size: 1.4rem;
+    line-height: 1.4;
+    color: #28a745;
+    display: none;
+}
+
+.gh-form.success [data-members-success] {
+    display: block;
+}
+
+.gh-form.success [data-members-error] {
+    display: none;
+}
+
 @media (max-width: 576px) {
     .gh-form {
         font-size: 1.6rem;
@@ -5741,6 +5760,26 @@ body[class*=" gh-font-heading"]:not(.gh-font-heading-fira-sans):not(.gh-font-hea
     text-align: left;
 }
 
+.gh-membership-success {
+    position: absolute;
+    top: 100%;
+    margin-top: 8px;
+    width: 100%;
+    font-size: 1.4rem;
+    line-height: 1.4;
+    color: #28a745;
+    text-align: left;
+    display: none;
+}
+
+.gh-membership-form.success .gh-membership-success {
+    display: block;
+}
+
+.gh-membership-form.success .gh-membership-error {
+    display: none;
+}
+
 /* Horizontal Subscribe Section */
 .gh-horizontal-subscribe {
     display: block !important;
@@ -5846,6 +5885,25 @@ body[class*=" gh-font-heading"]:not(.gh-font-heading-fira-sans):not(.gh-font-hea
     margin-top: 8px;
     font-size: 1.4rem;
     text-align: left;
+}
+
+.gh-horizontal-subscribe-success {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    color: #28a745;
+    margin-top: 8px;
+    font-size: 1.4rem;
+    text-align: left;
+    display: none;
+}
+
+.gh-horizontal-subscribe-form.success .gh-horizontal-subscribe-success {
+    display: block;
+}
+
+.gh-horizontal-subscribe-form.success .gh-horizontal-subscribe-error {
+    display: none;
 }
 
 /* Responsive Design for Horizontal Subscribe */
