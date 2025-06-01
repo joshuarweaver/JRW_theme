@@ -14,16 +14,28 @@
             <div class="gh-inner">
                 <div class="gh-horizontal-subscribe-inner">
                     <div class="gh-horizontal-subscribe-content">
-                        <h3 class="gh-horizontal-subscribe-title">Get marketing insights that matter.</h3>
-                        <p class="gh-horizontal-subscribe-description">Join thousands of brand leaders getting strategic insights weekly.</p>
+                        <h3 class="gh-horizontal-subscribe-title">Get the marketing insights that transform brands and drive real impact.</h3>
+                        <p class="gh-horizontal-subscribe-description">Join thousands of leaders discovering how strategic excellence meets social change.</p>
+                        <p class="gh-horizontal-subscribe-main-copy">Every week, get battle-tested strategies from 14+ years bridging Fortune 500 boardrooms and nonprofit frontlines. From luxury brand campaigns to life-saving initiatives, discover the frameworks that turn marketing into meaningful change—whether you're driving profit, purpose, or both.</p>
                     </div>
                     <form class="gh-form gh-horizontal-subscribe-form" data-members-form>
-                        <input class="gh-form-input gh-horizontal-subscribe-input" id="horizontal-subscribe-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                        <div class="gh-horizontal-subscribe-form-fields">
+                            <input class="gh-form-input gh-horizontal-subscribe-name-input" id="horizontal-subscribe-name" name="name" type="text" placeholder="Your name" data-members-name>
+                            <input class="gh-form-input gh-horizontal-subscribe-input" id="horizontal-subscribe-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                        </div>
                         <button class="gh-button gh-horizontal-subscribe-button" type="submit" aria-label="Subscribe">
                             <span>Subscribe</span>
                             {{> "icons/loader"}}
                             {{> "icons/checkmark"}}
                         </button>
+                        {{!-- Cloudflare Turnstile --}}
+                        <div class="gh-horizontal-subscribe-turnstile">
+                            <div class="cf-turnstile" 
+                                 data-sitekey="0x4AAAAAABfhI_PYfudwrG75"
+                                 data-theme="light"
+                                 data-size="normal">
+                            </div>
+                        </div>
                         <p data-members-error class="gh-horizontal-subscribe-error"></p>
                         <p data-members-success class="gh-horizontal-subscribe-success" style="display: none;">Great! Check your inbox and click the link to confirm your subscription.</p>
                     </form>

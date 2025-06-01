@@ -80,6 +80,193 @@ production stylesheet in assets/built/screen.css
     --color-dark-border: rgb(255 255 255 / 0.5);
 }
 
+/* Dark Mode Variables - Dark Chocolate Theme */
+
+/* 1. Default dark mode variables */
+:root {
+    --dark-bg: #0a0604;
+    --dark-surface: #12090b;
+    --dark-surface-alt: #1a120e;
+    --dark-border: rgb(255 255 255 / 0.1);
+    --dark-text: #e8ddd5;
+    --dark-text-secondary: rgb(232 221 213 / 0.7);
+  }
+  
+  /* 2. Apply dark mode automatically based on system preference */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-white: var(--dark-bg);
+      --color-lighter-gray: rgb(255 255 255 / 0.06);
+      --color-light-gray: #2a1f1a;
+      --color-mid-gray: #4a3830;
+      --color-dark-gray: #c4a68c;
+      --color-darker-gray: var(--dark-text);
+      --color-black: #faf8f6;
+      --color-primary-text: var(--dark-text);
+      --color-secondary-text: var(--dark-text-secondary);
+      --color-border: var(--dark-border);
+      --color-dark-border: rgb(255 255 255 / 0.2);
+      --background-color: var(--dark-bg);
+    }
+    
+    body {
+      background-color: var(--background-color);
+    }
+    
+    .gh-form {
+      background-color: rgb(255 255 255 / 0.08);
+    }
+    
+    .gh-form:hover {
+      background-color: rgb(255 255 255 / 0.12);
+    }
+    
+    .gh-about,
+    .gh-cta-inner {
+      background-color: var(--dark-surface);
+    }
+    
+    .gh-content pre,
+    .gh-content :not(pre) > code {
+      background: var(--dark-surface-alt);
+      color: var(--dark-text);
+    }
+    
+    .kg-bookmark-card a.kg-bookmark-container {
+      background: var(--dark-surface) !important;
+      border: 1px solid var(--dark-border);
+    }
+    
+    .gh-article-image img,
+    .gh-card-image img {
+      opacity: 0.9;
+    }
+    
+    .gh-footer {
+      background-color: #080503;
+    }
+    
+    .pswp__bg {
+      background-color: rgba(10, 6, 4, 0.95);
+    }
+  }
+  
+  /* 3. Manual dark mode override (when user explicitly chooses dark) */
+  [data-theme="dark"] {
+    --color-white: var(--dark-bg);
+    --color-lighter-gray: rgb(255 255 255 / 0.06);
+    --color-light-gray: #2a1f1a;
+    --color-mid-gray: #4a3830;
+    --color-dark-gray: #c4a68c;
+    --color-darker-gray: var(--dark-text);
+    --color-black: #faf8f6;
+    --color-primary-text: var(--dark-text);
+    --color-secondary-text: var(--dark-text-secondary);
+    --color-border: var(--dark-border);
+    --color-dark-border: rgb(255 255 255 / 0.2);
+    --background-color: var(--dark-bg);
+  }
+  
+  [data-theme="dark"] body {
+    background-color: var(--background-color);
+  }
+  
+  [data-theme="dark"] .gh-form {
+    background-color: rgb(255 255 255 / 0.08);
+  }
+  
+  [data-theme="dark"] .gh-form:hover {
+    background-color: rgb(255 255 255 / 0.12);
+  }
+  
+  [data-theme="dark"] .gh-about,
+  [data-theme="dark"] .gh-cta-inner {
+    background-color: var(--dark-surface);
+  }
+  
+  [data-theme="dark"] .gh-content pre,
+  [data-theme="dark"] .gh-content :not(pre) > code {
+    background: var(--dark-surface-alt);
+    color: var(--dark-text);
+  }
+  
+  [data-theme="dark"] .kg-bookmark-card a.kg-bookmark-container {
+    background: var(--dark-surface) !important;
+    border: 1px solid var(--dark-border);
+  }
+  
+  [data-theme="dark"] .gh-article-image img,
+  [data-theme="dark"] .gh-card-image img {
+    opacity: 0.9;
+  }
+  
+  [data-theme="dark"] .gh-footer {
+    background-color: #080503;
+  }
+  
+  [data-theme="dark"] .pswp__bg {
+    background-color: rgba(10, 6, 4, 0.95);
+  }
+  
+  /* 4. Force light mode when user explicitly chooses light */
+  @media (prefers-color-scheme: dark) {
+    [data-theme="light"] {
+      --color-white: #fff;
+      --color-lighter-gray: rgb(0 0 0 / 0.05);
+      --color-light-gray: #e6e6e6;
+      --color-mid-gray: #ccc;
+      --color-dark-gray: #444;
+      --color-darker-gray: #15171a;
+      --color-black: #000;
+      --color-primary-text: var(--color-darker-gray);
+      --color-secondary-text: rgb(0 0 0 / 0.55);
+      --color-border: rgb(0 0 0 / 0.08);
+      --color-dark-border: rgb(0 0 0 / 0.55);
+      --background-color: #fff;
+    }
+    
+    [data-theme="light"] body {
+      background-color: #fff;
+    }
+  }
+  
+  /* Smooth transitions */
+  body,
+  .gh-navigation,
+  .gh-form,
+  .gh-about,
+  .gh-footer {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* Dark mode toggle button */
+  .theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    background: var(--color-lighter-gray);
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .theme-toggle:hover {
+    transform: scale(1.1);
+  }
+  
+  .theme-toggle svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--color-primary-text);
+  }
+
 /* 2. Fonts
 /* ---------------------------------------------------------- */
 

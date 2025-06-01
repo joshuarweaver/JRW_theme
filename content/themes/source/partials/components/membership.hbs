@@ -65,14 +65,25 @@
                                         {{else}}
                                             {{!-- Free tier with email subscription form --}}
                                             <form class="gh-form gh-membership-form" data-members-form>
-                                                <input class="gh-form-input gh-membership-email-input" id="membership-email-{{@index}}" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                                                <div class="gh-membership-form-fields">
+                                                    <input class="gh-form-input gh-membership-name-input" id="membership-name-{{@index}}" name="name" type="text" placeholder="Your name" data-members-name>
+                                                    <input class="gh-form-input gh-membership-email-input" id="membership-email-{{@index}}" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                                                </div>
                                                 <button class="gh-button gh-membership-subscribe" type="submit" aria-label="Subscribe">
                                                     <span>Subscribe</span>
                                                     {{> "icons/loader"}}
                                                     {{> "icons/checkmark"}}
                                                 </button>
+                                                {{!-- Cloudflare Turnstile --}}
+                                                <div class="gh-membership-turnstile">
+                                                    <div class="cf-turnstile" 
+                                                         data-sitekey="0x4AAAAAABfhI_PYfudwrG75"
+                                                         data-theme="light"
+                                                         data-size="normal">
+                                                    </div>
+                                                </div>
                                                 <p data-members-error class="gh-membership-error"></p>
-                                                <p data-members-success class="gh-membership-success" style="display: none;">Great! Check your inbox and click the link to confirm your subscription.</p>
+                                                <p data-members-success class="gh-membership-success">Great! Check your inbox and click the link to confirm your subscription.</p>
                                             </form>
                                         {{/if}}
                                     </div>
@@ -95,14 +106,25 @@
 
                                     <div class="gh-membership-tier-action">
                                         <form class="gh-form gh-membership-form" data-members-form>
-                                            <input class="gh-form-input gh-membership-email-input" id="membership-fallback-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                                            <div class="gh-membership-form-fields">
+                                                <input class="gh-form-input gh-membership-name-input" id="membership-name-fallback" name="name" type="text" placeholder="Your name" data-members-name>
+                                                <input class="gh-form-input gh-membership-email-input" id="membership-email-fallback" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                                            </div>
                                             <button class="gh-button gh-membership-subscribe" type="submit" aria-label="Subscribe">
-                                                <span>Join Now</span>
+                                                <span>Subscribe</span>
                                                 {{> "icons/loader"}}
                                                 {{> "icons/checkmark"}}
                                             </button>
+                                            {{!-- Cloudflare Turnstile --}}
+                                            <div class="gh-membership-turnstile">
+                                                <div class="cf-turnstile" 
+                                                     data-sitekey="0x4AAAAAABfhI_PYfudwrG75"
+                                                     data-theme="light"
+                                                     data-size="normal">
+                                                </div>
+                                            </div>
                                             <p data-members-error class="gh-membership-error"></p>
-                                            <p data-members-success class="gh-membership-success" style="display: none;">Great! Check your inbox and click the link to confirm your subscription.</p>
+                                            <p data-members-success class="gh-membership-success">Great! Check your inbox and click the link to confirm your subscription.</p>
                                         </form>
                                     </div>
                                 </div>

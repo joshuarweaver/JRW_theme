@@ -66,6 +66,84 @@
 {{!-- Scripts - handle responsive videos, infinite scroll, and navigation dropdowns --}}
 <script src="{{asset "built/source.js"}}"></script>
 
+{{!-- Dark Mode Toggle Script --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const toggle = document.getElementById('theme-toggle');
+  
+  if (!toggle) {
+    console.warn('Dark mode toggle button not found');
+    return;
+  }
+  
+  const sunIcon = toggle.querySelector('.sun-icon');
+  const moonIcon = toggle.querySelector('.moon-icon');
+  const html = document.documentElement;
+  
+  if (!sunIcon || !moonIcon) {
+    console.warn('Dark mode toggle icons not found');
+    return;
+  }
+  
+  // Check for saved theme preference or default to system preference
+  const savedTheme = localStorage.getItem('theme');
+  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+  function setTheme(theme) {
+    if (theme === 'dark') {
+      html.setAttribute('data-theme', 'dark');
+      moonIcon.style.display = 'none';
+      sunIcon.style.display = 'block';
+    } else if (theme === 'light') {
+      html.setAttribute('data-theme', 'light');
+      sunIcon.style.display = 'none';
+      moonIcon.style.display = 'block';
+    } else {
+      // Auto mode - remove data-theme attribute
+      html.removeAttribute('data-theme');
+      if (systemPrefersDark) {
+        moonIcon.style.display = 'none';
+        sunIcon.style.display = 'block';
+      } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      }
+    }
+  }
+  
+  // Initialize theme
+  if (savedTheme) {
+    setTheme(savedTheme);
+  } else {
+    setTheme('auto');
+  }
+  
+  // Toggle theme
+  toggle.addEventListener('click', function() {
+    const currentTheme = html.getAttribute('data-theme');
+    let newTheme;
+    
+    if (!currentTheme || currentTheme === 'auto') {
+      newTheme = systemPrefersDark ? 'light' : 'dark';
+    } else if (currentTheme === 'dark') {
+      newTheme = 'light';
+    } else {
+      newTheme = 'dark';
+    }
+    
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+  });
+  
+  // Listen for system theme changes
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!html.hasAttribute('data-theme')) {
+      setTheme('auto');
+    }
+  });
+});
+</script>
+
 {{!-- Ghost outputs required functional scripts with this tag, it should always be the last thing before the closing body tag --}}
 {{ghost_foot}}
 
