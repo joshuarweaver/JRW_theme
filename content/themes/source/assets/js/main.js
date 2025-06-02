@@ -444,3 +444,52 @@
     }
 
 })();
+
+/* Smooth scrolling for anchor links */
+(function() {
+    // Handle all anchor links, especially the Subscribe button to #join-experts
+    document.addEventListener('click', function(e) {
+        // Check if the clicked element is a link with a hash
+        const link = e.target.closest('a[href*="#"]');
+        if (!link) return;
+        
+        const href = link.getAttribute('href');
+        if (!href) return;
+        
+        // Check if it's an anchor link (contains # but not just #)
+        const hashIndex = href.indexOf('#');
+        if (hashIndex === -1 || href === '#') return;
+        
+        // Extract the hash part
+        const hash = href.substring(hashIndex);
+        const targetId = hash.substring(1);
+        
+        // Check if this is a same-page anchor link
+        const linkUrl = new URL(link.href, window.location.href);
+        const currentUrl = new URL(window.location.href);
+        
+        // Only handle same-page anchors
+        if (linkUrl.pathname === currentUrl.pathname && linkUrl.hostname === currentUrl.hostname) {
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+                e.preventDefault();
+                
+                // Calculate scroll position with offset for fixed header
+                const headerHeight = document.querySelector('.gh-navigation')?.offsetHeight || 80;
+                const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
+                
+                // Smooth scroll to target
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+                
+                // Update URL without jumping
+                if (history.pushState) {
+                    history.pushState(null, null, hash);
+                }
+            }
+        }
+    });
+})();

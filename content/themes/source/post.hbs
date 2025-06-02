@@ -51,16 +51,29 @@
             <section class="gh-horizontal-subscribe gh-canvas" style="margin-bottom: 60px;">
                 <div class="gh-horizontal-subscribe-inner" style="grid-column: wide;">
                     <div class="gh-horizontal-subscribe-content">
-                        <h3 class="gh-horizontal-subscribe-title">Get marketing insights that matter.</h3>
-                        <p class="gh-horizontal-subscribe-description">Join thousands of brand leaders getting strategic insights weekly.</p>
+                        <h3 class="gh-horizontal-subscribe-title">Get the marketing insights that transform brands and drive real impact.</h3>
+                        <p class="gh-horizontal-subscribe-description">Join thousands of leaders discovering how strategic excellence meets social change.</p>
+                        <p class="gh-horizontal-subscribe-main-copy">Every week, get battle-tested strategies from 14+ years bridging Fortune 500 boardrooms and nonprofit frontlines. From luxury brand campaigns to life-saving initiatives, discover the frameworks that turn marketing into meaningful change—whether you're driving profit, purpose, or both.</p>
                     </div>
                     <form class="gh-form gh-horizontal-subscribe-form" data-members-form>
-                        <input class="gh-form-input gh-horizontal-subscribe-input" id="post-horizontal-subscribe-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                        <div class="gh-horizontal-subscribe-form-fields">
+                            <input class="gh-form-input gh-horizontal-subscribe-name-input" id="post-horizontal-subscribe-name" name="name" type="text" placeholder="Your name" data-members-name>
+                            <input class="gh-form-input gh-horizontal-subscribe-input" id="post-horizontal-subscribe-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                        </div>
                         <button class="gh-button gh-horizontal-subscribe-button" type="submit" aria-label="Subscribe">
                             <span>Subscribe</span>
                             {{> "icons/loader"}}
                             {{> "icons/checkmark"}}
                         </button>
+                        {{!-- Cloudflare Turnstile --}}
+                        <div class="gh-horizontal-subscribe-turnstile">
+                            <div class="cf-turnstile" 
+                                 data-sitekey="0x4AAAAAABfhI_PYfudwrG75"
+                                 data-theme="light"
+                                 data-size="normal"
+                                 data-callback="onTurnstileSuccess">
+                            </div>
+                        </div>
                         <p data-members-error class="gh-horizontal-subscribe-error"></p>
                         <p data-members-success class="gh-horizontal-subscribe-success" style="display: none;">Great! Check your inbox and click the link to confirm your subscription.</p>
                     </form>
@@ -106,23 +119,145 @@
 
 {{!-- Join the Experts CTA Section --}}
 {{#unless @member}}
-    <section style="display: block !important; background: var(--color-lighter-gray); padding: 100px 0; margin: 60px 0 0 0; width: 100vw; margin-left: calc(-50vw + 50%);">
-        <div style="max-width: 1200px; margin: 0 auto; text-align: center; padding: 0 40px;">
-            <div style="max-width: 800px; margin: 0 auto 48px;">
-                <h2 style="font-size: 4.8rem; font-weight: 700; margin-bottom: 20px; line-height: 1.1;">Join the Experts</h2>
-                <p style="font-size: 2rem; line-height: 1.4; opacity: 0.9;">Marketing insights with meaning, strategy with soul. Join a community of brand leaders and changemakers who demand more than surface-level takes.</p>
-            </div>
-            <div style="max-width: 500px; margin: 0 auto;">
-                <form class="gh-form" data-members-form style="display: flex; gap: 0; width: 100%;">
-                    <input class="gh-form-input" id="post-cta-email" name="email" type="email" placeholder="jamie@example.com" required data-members-email style="flex: 1; padding: 16px 20px; border: 1px solid #e1e5e9; border-radius: 0; font-size: 1.6rem; height: 56px; box-sizing: border-box; border-right: none; position: static;">
-                    <button class="gh-button" type="submit" aria-label="Subscribe" style="padding: 16px 32px; background: var(--ghost-accent-color); color: white; border: 1px solid var(--ghost-accent-color); border-radius: 0; cursor: pointer; font-size: 1.6rem; font-weight: 600; height: 56px; box-sizing: border-box; width: auto; position: static;">
-                        <span>Subscribe</span>
-                        {{> "icons/loader"}}
-                        {{> "icons/checkmark"}}
-                    </button>
-                </form>
-                <p data-members-error style="color: red; margin-top: 8px; text-align: left;"></p>
-                <p data-members-success style="color: green; margin-top: 8px; text-align: left; display: none;">Great! Check your inbox and click the link to confirm your subscription.</p>
+    <section style="display: block !important; background: var(--color-lighter-gray); padding: 100px 0 140px 0; margin: 60px 0 0 0; width: 100vw; margin-left: calc(-50vw + 50%);">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 max(4vmin, 20px);">
+            <div style="margin: 0;">
+                <h2 style="font-size: 4.8rem; font-weight: 700; margin-bottom: 20px; line-height: 1.1; text-align: left;">Join the Experts</h2>
+                <p style="font-size: 1.8rem; line-height: 1.4; opacity: 0.9; text-align: left; margin-bottom: 48px; max-width: 66%; padding-bottom: 24px;">Stop settling for recycled LinkedIn wisdom and algorithm-chasing tactics. This is where senior marketers come to sharpen their edge—diving deep into the psychology, strategy, and cultural intelligence that turn powerful campaigns into movements that reshape industries and drive meaningful results.</p>
+                
+                {{!-- Membership Tiers --}}
+                <div class="gh-membership-tiers">
+                    {{#get "tiers" include="monthly_price,yearly_price,benefits" limit="all" as |tiers|}}
+                        {{#foreach tiers}}
+                            <div class="gh-membership-tier {{#if type}}gh-tier-{{type}}{{/if}}">
+                                <div class="gh-membership-tier-header">
+                                    <h3 class="gh-membership-tier-name">{{name}}</h3>
+                                    {{#if description}}
+                                        <p class="gh-membership-tier-description">{{description}}</p>
+                                    {{/if}}
+                                </div>
+                                
+                                <div class="gh-membership-tier-price">
+                                    {{#if monthly_price}}
+                                        <span class="gh-membership-price">
+                                            <span class="gh-membership-amount">{{price monthly_price}}</span>
+                                            <span class="gh-membership-interval">/month</span>
+                                        </span>
+                                    {{else}}
+                                        <span class="gh-membership-price">
+                                            <span class="gh-membership-amount">Free</span>
+                                        </span>
+                                    {{/if}}
+                                </div>
+
+                                {{#if benefits}}
+                                    <ul class="gh-membership-benefits">
+                                        {{#foreach benefits}}
+                                            <li class="gh-membership-benefit">
+                                                <svg class="gh-membership-check" viewBox="0 0 16 16">
+                                                    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                                </svg>
+                                                {{name}}
+                                            </li>
+                                        {{/foreach}}
+                                    </ul>
+                                {{/if}}
+
+                                <div class="gh-membership-tier-action">
+                                    {{#if monthly_price}}
+                                        <form class="gh-form gh-membership-form gh-membership-paid-form" data-tier-id="{{id}}">
+                                            <div class="gh-membership-form-fields">
+                                                <input class="gh-form-input gh-membership-name-input" id="paid-tier-name-{{@index}}" name="name" type="text" placeholder="Your name" required>
+                                                <input class="gh-form-input gh-membership-email-input" id="paid-tier-email-{{@index}}" name="email" type="email" placeholder="jamie@example.com" required>
+                                            </div>
+                                            <button type="submit" class="gh-button gh-membership-subscribe" aria-label="Subscribe">
+                                                <span>Subscribe Monthly</span>
+                                                {{> "icons/loader"}}
+                                                {{> "icons/checkmark"}}
+                                            </button>
+                                            {{!-- Cloudflare Turnstile for paid tiers --}}
+                                            <div class="gh-membership-turnstile">
+                                                <div class="cf-turnstile" 
+                                                     data-sitekey="0x4AAAAAABfhI_PYfudwrG75"
+                                                     data-theme="light"
+                                                     data-size="normal"
+                                                     data-callback="onTurnstileSuccess">
+                                                </div>
+                                            </div>
+                                            <p data-members-error class="gh-membership-error"></p>
+                                            <p data-members-success class="gh-membership-success">Redirecting to secure checkout...</p>
+                                        </form>
+                                    {{else}}
+                                        {{!-- Free tier with email subscription form --}}
+                                        <form class="gh-form gh-membership-form" data-members-form>
+                                            <div class="gh-membership-form-fields">
+                                                <input class="gh-form-input gh-membership-name-input" id="membership-name-{{@index}}" name="name" type="text" placeholder="Your name" data-members-name>
+                                                <input class="gh-form-input gh-membership-email-input" id="membership-email-{{@index}}" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                                            </div>
+                                            <button class="gh-button gh-membership-subscribe" type="submit" aria-label="Subscribe">
+                                                <span>Subscribe</span>
+                                                {{> "icons/loader"}}
+                                                {{> "icons/checkmark"}}
+                                            </button>
+                                            {{!-- Cloudflare Turnstile --}}
+                                            <div class="gh-membership-turnstile">
+                                                <div class="cf-turnstile" 
+                                                     data-sitekey="0x4AAAAAABfhI_PYfudwrG75"
+                                                     data-theme="light"
+                                                     data-size="normal"
+                                                     data-callback="onTurnstileSuccess">
+                                                </div>
+                                            </div>
+                                            <p data-members-error class="gh-membership-error"></p>
+                                            <p data-members-success class="gh-membership-success">Great! Check your inbox and click the link to confirm your subscription.</p>
+                                        </form>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        {{/foreach}}
+                    {{else}}
+                        {{!-- Fallback if no tiers available --}}
+                        <div class="gh-membership-fallback">
+                            <div class="gh-membership-tier">
+                                <div class="gh-membership-tier-header">
+                                    <h3 class="gh-membership-tier-name">Newsletter</h3>
+                                    <p class="gh-membership-tier-description">Stay updated with the latest insights and strategies.</p>
+                                </div>
+                                
+                                <div class="gh-membership-tier-price">
+                                    <span class="gh-membership-price">
+                                        <span class="gh-membership-amount">Free</span>
+                                    </span>
+                                </div>
+
+                                <div class="gh-membership-tier-action">
+                                    <form class="gh-form gh-membership-form" data-members-form>
+                                        <div class="gh-membership-form-fields">
+                                            <input class="gh-form-input gh-membership-name-input" id="membership-name-fallback" name="name" type="text" placeholder="Your name" data-members-name>
+                                            <input class="gh-form-input gh-membership-email-input" id="membership-email-fallback" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                                        </div>
+                                        <button class="gh-button gh-membership-subscribe" type="submit" aria-label="Subscribe">
+                                            <span>Subscribe</span>
+                                            {{> "icons/loader"}}
+                                            {{> "icons/checkmark"}}
+                                        </button>
+                                        {{!-- Cloudflare Turnstile --}}
+                                        <div class="gh-membership-turnstile">
+                                            <div class="cf-turnstile" 
+                                                 data-sitekey="0x4AAAAAABfhI_PYfudwrG75"
+                                                 data-theme="light"
+                                                 data-size="normal"
+                                                 data-callback="onTurnstileSuccess">
+                                            </div>
+                                        </div>
+                                        <p data-members-error class="gh-membership-error"></p>
+                                        <p data-members-success class="gh-membership-success">Great! Check your inbox and click the link to confirm your subscription.</p>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {{/get}}
+                </div>
             </div>
         </div>
     </section>

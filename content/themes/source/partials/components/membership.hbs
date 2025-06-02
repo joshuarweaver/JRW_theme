@@ -1,11 +1,11 @@
 {{!-- Membership Section --}}
-<section class="gh-membership">
+<section class="gh-membership" id="join-experts">
     <div class="gh-outer">
         <div class="gh-inner">
             <div class="gh-membership-inner">
                 <div class="gh-membership-header">
                     <h2 class="gh-membership-title">Join the Experts</h2>
-                    <p class="gh-membership-description">Marketing insights with meaning, strategy with soul. Join a community of brand leaders and changemakers who demand more than surface-level takes.</p>
+                    <p class="gh-membership-description">Marketing that moves markets and humans. Strategy that builds empires without selling souls. Where visionary leaders craft award-winning work that matters—turning data into empathy and profit into progress.</p>
                 </div>
 
                 {{!-- Check if member is logged in --}}
@@ -61,7 +61,28 @@
 
                                     <div class="gh-membership-tier-action">
                                         {{#if monthly_price}}
-                                            <a href="javascript:" data-portal="signup/{{id}}/monthly" class="gh-button gh-membership-subscribe">Subscribe Monthly</a>
+                                            <form class="gh-form gh-membership-form gh-membership-paid-form" data-tier-id="{{id}}">
+                                                <div class="gh-membership-form-fields">
+                                                    <input class="gh-form-input gh-membership-name-input" id="paid-tier-name-{{@index}}" name="name" type="text" placeholder="Your name" required>
+                                                    <input class="gh-form-input gh-membership-email-input" id="paid-tier-email-{{@index}}" name="email" type="email" placeholder="jamie@example.com" required>
+                                                </div>
+                                                <button type="submit" class="gh-button gh-membership-subscribe" aria-label="Subscribe">
+                                                    <span>Subscribe Monthly</span>
+                                                    {{> "icons/loader"}}
+                                                    {{> "icons/checkmark"}}
+                                                </button>
+                                                {{!-- Cloudflare Turnstile for paid tiers --}}
+                                                <div class="gh-membership-turnstile">
+                                                    <div class="cf-turnstile" 
+                                                         data-sitekey="0x4AAAAAABfhI_PYfudwrG75"
+                                                         data-theme="light"
+                                                         data-size="normal"
+                                                         data-callback="onTurnstileSuccess">
+                                                    </div>
+                                                </div>
+                                                <p data-members-error class="gh-membership-error"></p>
+                                                <p data-members-success class="gh-membership-success">Redirecting to secure checkout...</p>
+                                            </form>
                                         {{else}}
                                             {{!-- Free tier with email subscription form --}}
                                             <form class="gh-form gh-membership-form" data-members-form>
@@ -79,7 +100,8 @@
                                                     <div class="cf-turnstile" 
                                                          data-sitekey="0x4AAAAAABfhI_PYfudwrG75"
                                                          data-theme="light"
-                                                         data-size="normal">
+                                                         data-size="normal"
+                                                         data-callback="onTurnstileSuccess">
                                                     </div>
                                                 </div>
                                                 <p data-members-error class="gh-membership-error"></p>
@@ -120,7 +142,8 @@
                                                 <div class="cf-turnstile" 
                                                      data-sitekey="0x4AAAAAABfhI_PYfudwrG75"
                                                      data-theme="light"
-                                                     data-size="normal">
+                                                     data-size="normal"
+                                                     data-callback="onTurnstileSuccess">
                                                 </div>
                                             </div>
                                             <p data-members-error class="gh-membership-error"></p>

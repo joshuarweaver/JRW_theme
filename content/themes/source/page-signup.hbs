@@ -1,0 +1,520 @@
+{{!< default}}
+{{!-- Custom Sign Up Page --}}
+
+<main class="gh-main gh-outer">
+    <div class="gh-inner">
+        <article class="gh-article {{post_class}}">
+            
+            {{!-- Check if user is already signed in --}}
+            {{#if @member}}
+                <script>
+                    // Redirect to account page if already signed in
+                    window.location.href = '{{@site.url}}/account/';
+                </script>
+            {{/if}}
+            
+            <div class="gh-membership-container">
+                <div class="gh-membership-inner">
+                    <div class="gh-membership-header">
+                        {{!-- Logo removed as per CSS --}}
+                        <h1 class="gh-membership-title">Join the Experts</h1>
+                        <p class="gh-membership-description">Marketing insights with meaning, strategy with soul.</p>
+                    </div>
+
+                    {{!-- Tier Cards --}}
+                    <div class="gh-membership-tiers">
+                        {{#get "tiers" include="monthly_price,yearly_price,benefits" limit="all" as |tiers|}}
+                            {{#foreach tiers}}
+                                <div class="gh-membership-tier {{#if type}}gh-tier-{{type}}{{else}}gh-tier-{{#if monthly_price}}paid{{else}}free{{/if}}{{/if}}">
+                                    <div class="gh-membership-tier-header">
+                                        <h3 class="gh-membership-tier-name">{{name}}</h3>
+                                        {{#if description}}
+                                            <p class="gh-membership-tier-description">{{description}}</p>
+                                        {{/if}}
+                                    </div>
+                                    
+                                    <div class="gh-membership-tier-price">
+                                        {{#if monthly_price}}
+                                            <span class="gh-membership-price">
+                                                <span class="gh-membership-amount">{{price monthly_price}}</span>
+                                                <span class="gh-membership-interval">/month</span>
+                                            </span>
+                                        {{else}}
+                                            <span class="gh-membership-price">
+                                                <span class="gh-membership-amount">Free</span>
+                                            </span>
+                                        {{/if}}
+                                    </div>
+
+                                    {{!-- Benefits list - will be populated by CSS --}}
+                                    <ul class="gh-membership-tier-benefits">
+                                        {{#if monthly_price}}
+                                            {{!-- Paid tier benefits --}}
+                                            <li><span>✓</span></li>
+                                            <li><span>✓</span></li>
+                                            <li><span>✓</span></li>
+                                            <li><span>✓</span></li>
+                                            <li><span>✓</span></li>
+                                        {{else}}
+                                            {{!-- Free tier benefits --}}
+                                            <li><span>✓</span></li>
+                                            <li><span>✓</span></li>
+                                            <li><span>✓</span></li>
+                                        {{/if}}
+                                    </ul>
+
+                                    <div class="gh-membership-tier-action">
+                                        {{#if monthly_price}}
+                                            {{!-- Paid tier form --}}
+                                            <form class="gh-membership-paid-form" data-tier-id="{{id}}">
+                                                <div class="gh-membership-form-fields">
+                                                    <input class="gh-form-input" name="name" type="text" placeholder="Your name" required>
+                                                    <input class="gh-form-input" name="email" type="email" placeholder="jamie@example.com" required>
+                                                </div>
+                                                <button class="gh-button" type="submit">
+                                                    <span>Choose {{name}}</span>
+                                                </button>
+                                                <p data-members-error></p>
+                                                <p data-members-success>Redirecting to secure checkout...</p>
+                                            </form>
+                                        {{else}}
+                                            {{!-- Free tier form --}}
+                                            <form class="gh-form gh-membership-form" data-members-form>
+                                                <div class="gh-membership-form-fields">
+                                                    <input class="gh-form-input" name="name" type="text" placeholder="Your name" data-members-name>
+                                                    <input class="gh-form-input" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                                                </div>
+                                                <button class="gh-button" type="submit">
+                                                    <span>Subscribe</span>
+                                                    {{> "icons/loader"}}
+                                                    {{> "icons/checkmark"}}
+                                                </button>
+                                                {{!-- Cloudflare Turnstile --}}
+                                                <div class="gh-membership-turnstile">
+                                                    <div class="cf-turnstile" 
+                                                         data-sitekey="0x4AAAAAABfhI_PYfudwrG75"
+                                                         data-theme="light"
+                                                         data-size="normal"
+                                                         data-callback="onTurnstileSuccess">
+                                                    </div>
+                                                </div>
+                                                <p data-members-error></p>
+                                                <p data-members-success>Great! Check your inbox and click the link to confirm your subscription.</p>
+                                            </form>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                            {{/foreach}}
+                        {{else}}
+                            {{!-- Fallback if no tiers are configured --}}
+                            <div class="gh-membership-tier gh-tier-free">
+                                <div class="gh-membership-tier-header">
+                                    <h3 class="gh-membership-tier-name">Free Membership</h3>
+                                    <p class="gh-membership-tier-description">Get access to all free content and updates</p>
+                                </div>
+                                
+                                <div class="gh-membership-tier-price">
+                                    <span class="gh-membership-price">
+                                        <span class="gh-membership-amount">Free</span>
+                                    </span>
+                                </div>
+
+                                <ul class="gh-membership-tier-benefits">
+                                    <li><span>✓</span></li>
+                                    <li><span>✓</span></li>
+                                    <li><span>✓</span></li>
+                                </ul>
+                                
+                                <div class="gh-membership-tier-action">
+                                    <form class="gh-form gh-membership-form" data-members-form>
+                                        <div class="gh-membership-form-fields">
+                                            <input class="gh-form-input" name="name" type="text" placeholder="Your name" data-members-name>
+                                            <input class="gh-form-input" name="email" type="email" placeholder="jamie@example.com" required data-members-email>
+                                        </div>
+                                        <button class="gh-button" type="submit">
+                                            <span>Subscribe</span>
+                                            {{> "icons/loader"}}
+                                            {{> "icons/checkmark"}}
+                                        </button>
+                                        {{!-- Cloudflare Turnstile --}}
+                                        <div class="gh-membership-turnstile">
+                                            <div class="cf-turnstile" 
+                                                 data-sitekey="0x4AAAAAABfhI_PYfudwrG75"
+                                                 data-theme="light"
+                                                 data-size="normal"
+                                                 data-callback="onTurnstileSuccess">
+                                            </div>
+                                        </div>
+                                        <p data-members-error></p>
+                                        <p data-members-success>Great! Check your inbox and click the link to confirm your subscription.</p>
+                                    </form>
+                                </div>
+                            </div>
+                        {{/get}}
+                    </div>
+                    
+                    {{!-- Sign in link --}}
+                    <p class="gh-membership-signin-link">
+                        Already have an account? <a href="{{@site.url}}/signin/">Sign in</a>
+                    </p>
+                </div>
+            </div>
+            
+        </article>
+    </div>
+</main>
+
+{{!-- All integrated styles --}}
+<style>
+/* Base container styles */
+.gh-membership-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 0;
+}
+
+.gh-membership-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+/* Hide the title and original description */
+.gh-membership-title {
+    display: none !important;
+}
+
+/* Replace description text */
+.gh-membership-description {
+    font-size: 0 !important;
+}
+
+.gh-membership-description::before {
+    content: "Marketing that moves markets and humans. Strategy that builds empires without selling souls. Where visionary leaders craft award-winning work that matters—turning data into empathy and profit into progress.";
+    font-size: 1.9rem !important;
+    line-height: 1.6 !important;
+    color: #4a5568 !important;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.gh-membership-description::after {
+    content: "Join the 1K+ marketers turning weekly insight into transformative impact and meaningful results.";
+    font-size: 2.1rem !important;
+    font-weight: 700 !important;
+    color: #1a202c !important;
+    display: block;
+    margin-top: 20px;
+    letter-spacing: -0.02em;
+    text-align: center;
+}
+
+/* Tier grid */
+.gh-membership-tiers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+    margin-bottom: 48px;
+}
+
+/* Tier card styles */
+.gh-membership-tier {
+    background: white;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    position: relative;
+}
+
+.gh-membership-tier-name {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+
+.gh-membership-tier-description {
+    font-size: 1.6rem;
+    line-height: 1.5;
+    color: #666;
+    margin: 0 0 24px;
+}
+
+/* Price styles */
+.gh-membership-tier-price {
+    margin-bottom: 24px;
+}
+
+.gh-membership-amount {
+    font-size: 3.6rem;
+    font-weight: 700;
+}
+
+.gh-membership-interval {
+    font-size: 1.8rem;
+    color: #666;
+}
+
+/* Benefits list styling */
+.gh-membership-tier-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px !important;
+    padding-right: 50px !important;
+    display: block !important;
+}
+
+.gh-membership-tier-benefits li {
+    display: flex !important;
+    align-items: flex-start !important;
+    padding: 8px 0;
+    font-size: 1.6rem;
+    position: relative;
+}
+
+.gh-membership-tier-benefits li span {
+    color: var(--ghost-accent-color);
+    margin-right: 12px;
+}
+
+/* Inject benefit text for paid tier */
+.gh-tier-paid .gh-membership-tier-benefits li:nth-child(1)::after {
+    content: "Everything in the Anti-Buzzword club +";
+    color: #2d3748;
+}
+
+.gh-tier-paid .gh-membership-tier-benefits li:nth-child(2)::after {
+    content: "Monthly strategic takes on campaigns genuinely moving culture.";
+    color: #2d3748;
+}
+
+.gh-tier-paid .gh-membership-tier-benefits li:nth-child(3)::after {
+    content: "Insights that hit your inbox before they hit everyone else's strategy deck.";
+    color: #2d3748;
+}
+
+.gh-tier-paid .gh-membership-tier-benefits li:nth-child(4)::after {
+    content: "Exclusive case studies and frameworks to fuel your next marketing strategy.";
+    color: #2d3748;
+}
+
+.gh-tier-paid .gh-membership-tier-benefits li:nth-child(5)::after {
+    content: "Early access to new member-only content drops, including whitepapers, interviews, and more.";
+    color: #2d3748;
+}
+
+/* Inject benefit text for free tier */
+.gh-tier-free .gh-membership-tier-benefits li:nth-child(1)::after {
+    content: "Twice-weekly drops of marketing wisdom that cut through the BS";
+    color: #2d3748;
+}
+
+.gh-tier-free .gh-membership-tier-benefits li:nth-child(2)::after {
+    content: "Member-only insights before they become everyone's \"hot take\"";
+    color: #2d3748;
+}
+
+.gh-tier-free .gh-membership-tier-benefits li:nth-child(3)::after {
+    content: "Community invites + new perks added regularly (we keep it fresh)";
+    color: #2d3748;
+}
+
+/* Form action styles with z-index fixes */
+.gh-membership-tier-action {
+    display: block !important;
+    margin-top: 30px !important;
+    position: relative !important;
+    overflow: visible !important;
+}
+
+/* Fix form z-index issues */
+.gh-membership-form-fields {
+    position: relative !important;
+    z-index: 10 !important;
+    margin-bottom: 20px !important;
+}
+
+.gh-form-input {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 10 !important;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1.6rem;
+    border: 1px solid #ddd;
+    margin-bottom: 12px;
+    background: white !important;
+}
+
+.gh-button {
+    position: relative !important;
+    z-index: 5 !important;
+    margin-top: 0 !important;
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 1.6rem;
+    font-weight: 600;
+    background: var(--ghost-accent-color);
+    color: white;
+    border: 2px solid var(--ghost-accent-color);
+    cursor: pointer;
+}
+
+/* Turnstile widget placement */
+.gh-membership-turnstile {
+    position: relative !important;
+    z-index: 1 !important;
+    margin-top: 20px !important;
+}
+
+.cf-turnstile {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Force form to stack properly */
+.gh-form.gh-membership-form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+}
+
+/* Message styles */
+[data-members-error],
+[data-members-success] {
+    display: none;
+    margin-top: 12px;
+    font-size: 1.4rem;
+    padding: 8px 12px;
+}
+
+[data-members-error] {
+    color: #f50b23;
+    background: #ffeaea;
+}
+
+[data-members-success] {
+    color: #079a3d;
+    background: #e8f8ee;
+}
+
+/* Sign in link */
+.gh-membership-signin-link {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #666;
+}
+
+.gh-membership-signin-link a {
+    color: var(--ghost-accent-color);
+    text-decoration: none;
+}
+
+/* Mobile responsive - Tablet */
+@media (max-width: 768px) {
+    .gh-membership-container {
+        padding: 30px 15px !important;
+    }
+    
+    .gh-membership-tier {
+        padding: 30px 20px !important;
+    }
+    
+    .gh-membership-description::before {
+        font-size: 1.6rem !important;
+    }
+    
+    .gh-membership-description::after {
+        font-size: 1.8rem !important;
+    }
+    
+    .gh-membership-tiers {
+        gap: 24px !important;
+        grid-template-columns: 1fr;
+    }
+    
+    .gh-membership-tier-name {
+        font-size: 2rem !important;
+    }
+    
+    .gh-membership-amount {
+        font-size: 3rem !important;
+    }
+    
+    .gh-membership-tier-benefits {
+        padding-right: 20px !important;
+    }
+}
+
+/* Mobile responsive - Phone */
+@media (max-width: 480px) {
+    .gh-membership-container {
+        padding: 20px 10px !important;
+    }
+    
+    .gh-membership-tier {
+        padding: 24px 16px !important;
+    }
+    
+    .gh-membership-description::before {
+        font-size: 1.4rem !important;
+        line-height: 1.5 !important;
+    }
+    
+    .gh-membership-description::after {
+        font-size: 1.6rem !important;
+    }
+    
+    .gh-membership-tier-benefits li {
+        font-size: 1.4rem;
+    }
+    
+    .gh-membership-tier-benefits li::after {
+        font-size: 1.4rem !important;
+    }
+    
+    .gh-form-input {
+        font-size: 1.4rem;
+        padding: 10px 14px;
+    }
+    
+    .gh-button {
+        font-size: 1.4rem;
+        padding: 10px 20px;
+    }
+}
+</style>
+
+{{!-- Handle paid tier forms --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paidForms = document.querySelectorAll('.gh-membership-paid-form');
+    
+    paidForms.forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const nameInput = form.querySelector('input[name="name"]');
+            const emailInput = form.querySelector('input[name="email"]');
+            const tierId = form.dataset.tierId;
+            
+            // Use Ghost Portal for checkout
+            if (window.location.hash !== `#/portal/signup/${tierId}`) {
+                // Store form data temporarily
+                sessionStorage.setItem('portal-prefill-name', nameInput.value);
+                sessionStorage.setItem('portal-prefill-email', emailInput.value);
+                
+                // Show success message
+                const successEl = form.querySelector('[data-members-success]');
+                if (successEl) {
+                    successEl.style.display = 'block';
+                }
+                
+                // Redirect to Ghost Portal checkout after a brief delay
+                setTimeout(() => {
+                    window.location.hash = `#/portal/signup/${tierId}`;
+                }, 1000);
+            }
+        });
+    });
+});
+</script> 

@@ -1,0 +1,278 @@
+{{!< default}}
+{{!-- Custom Sign In Page --}}
+
+<main class="gh-main gh-outer">
+    <div class="gh-inner">
+        <article class="gh-article {{post_class}}">
+            
+            {{!-- Check if user is already signed in --}}
+            {{#if @member}}
+                <div style="text-align: center; padding: 60px 20px;">
+                    <p>You are already signed in. Redirecting to account page...</p>
+                </div>
+                <script>
+                    // Redirect to account page if already signed in
+                    setTimeout(function() {
+                        window.location.href = '{{@site.url}}/account/';
+                    }, 1000);
+                </script>
+            {{else}}
+            
+            <div class="gh-membership-auth-container">
+                <div class="gh-membership-auth-box">
+                    
+                    {{!-- Logo --}}
+                    <div class="gh-membership-auth-logo">
+                        <img src="{{asset "images/logo-light.png"}}" alt="{{@site.title}}">
+                    </div>
+                    
+                    {{!-- Header --}}
+                    <div class="gh-membership-auth-header">
+                        <h1 class="gh-membership-auth-title">Sign in</h1>
+                        <p class="gh-membership-auth-description">Access your account</p>
+                    </div>
+                    
+                    {{!-- Sign in form --}}
+                    <form class="gh-membership-auth-form" data-members-form="signin">
+                        <div class="gh-membership-auth-form-fields">
+                            <input 
+                                class="gh-form-input gh-membership-auth-input" 
+                                type="email" 
+                                name="email" 
+                                placeholder="jamie@example.com" 
+                                required 
+                                autofocus
+                                data-members-email
+                            />
+                        </div>
+                        
+                        <button class="gh-button gh-membership-auth-button" type="submit">
+                            <span>Send sign in link</span>
+                            {{> "icons/loader"}}
+                        </button>
+                        
+                        {{!-- Error/Success Messages --}}
+                        <p data-members-error class="gh-membership-auth-error"></p>
+                        <p data-members-success class="gh-membership-auth-success">Great! Check your inbox for the sign in link.</p>
+                    </form>
+                    
+                    {{!-- Sign up link --}}
+                    <p class="gh-membership-auth-switch">
+                        Don't have an account? <a href="{{@site.url}}/signup/">Sign up</a>
+                    </p>
+                </div>
+            </div>
+            
+            {{/if}}
+            
+        </article>
+    </div>
+</main>
+
+{{!-- All styles in one place --}}
+<style>
+/* Container styles */
+.gh-membership-auth-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 60px 20px;
+    min-height: 500px; /* Ensure minimum height */
+}
+
+.gh-membership-auth-box {
+    background: white;
+    padding: 60px 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    position: relative;
+    z-index: 1;
+}
+
+/* Logo styles */
+.gh-membership-auth-logo {
+    margin-bottom: 16px;
+}
+
+.gh-membership-auth-logo img {
+    height: 40px;
+    width: auto;
+    display: block;
+}
+
+/* Header styles */
+.gh-membership-auth-header {
+    margin-bottom: 32px;
+}
+
+.gh-membership-auth-title {
+    margin: 0 0 12px 0;
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+}
+
+.gh-membership-auth-description {
+    margin: 0;
+    font-size: 1.8rem;
+    line-height: 1.4;
+    color: #666;
+}
+
+/* Form styles */
+.gh-membership-auth-form-fields {
+    margin-bottom: 16px;
+}
+
+.gh-membership-auth-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1.6rem;
+    border: 1px solid #ddd;
+    background: white;
+    color: #15171a;
+}
+
+.gh-membership-auth-button {
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 1.6rem;
+    font-weight: 600;
+    background: var(--ghost-accent-color);
+    color: white;
+    border: 2px solid var(--ghost-accent-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+/* Message styles */
+.gh-membership-auth-error,
+.gh-membership-auth-success {
+    display: none;
+    margin-top: 12px;
+    font-size: 1.4rem;
+    line-height: 1.4;
+    text-align: left;
+    padding: 8px 12px;
+}
+
+.gh-membership-auth-error {
+    color: #f50b23;
+    background: #ffeaea;
+}
+
+.gh-membership-auth-success {
+    color: #079a3d;
+    background: #e8f8ee;
+}
+
+/* Switch link styles */
+.gh-membership-auth-switch {
+    margin-top: 24px;
+    font-size: 1.5rem;
+    color: #666;
+    text-align: center;
+}
+
+.gh-membership-auth-switch a {
+    color: var(--ghost-accent-color);
+    text-decoration: none;
+}
+
+/* Form transitions */
+.gh-membership-auth-form button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.gh-membership-auth-form.loading .gh-membership-auth-button span {
+    visibility: hidden;
+}
+
+.gh-membership-auth-form.loading .gh-membership-auth-button svg {
+    display: inline-block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.gh-membership-auth-form .gh-membership-auth-button svg {
+    display: none;
+    width: 20px;
+    height: 20px;
+}
+
+/* Input focus styles */
+.gh-membership-auth-input:focus {
+    outline: none;
+    border-color: var(--ghost-accent-color);
+}
+
+/* Button hover effect */
+.gh-membership-auth-button:hover:not(:disabled) {
+    background-color: var(--color-primary-text);
+    border-color: var(--color-primary-text);
+    transform: translateY(-2px);
+}
+
+/* Link hover */
+.gh-membership-auth-switch a:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .gh-membership-auth-container {
+        padding: 40px 15px;
+    }
+    
+    .gh-membership-auth-box {
+        padding: 40px 30px;
+    }
+    
+    .gh-membership-auth-title {
+        font-size: 2.4rem;
+    }
+    
+    .gh-membership-auth-description {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .gh-membership-auth-container {
+        padding: 30px 10px;
+    }
+    
+    .gh-membership-auth-box {
+        padding: 30px 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .gh-membership-auth-title {
+        font-size: 2rem;
+    }
+    
+    .gh-membership-auth-input {
+        font-size: 1.4rem;
+        padding: 10px 14px;
+    }
+    
+    .gh-membership-auth-button {
+        font-size: 1.4rem;
+        padding: 10px 20px;
+    }
+}
+
+/* Debug helper - remove this after testing */
+.gh-membership-auth-container {
+    border: 2px dashed red;
+}
+</style>
+
+{{!-- Debug info - remove after testing --}}
+<div style="position: fixed; bottom: 10px; right: 10px; background: black; color: white; padding: 10px; font-size: 12px; z-index: 9999;">
+    Page: signin | Member: {{#if @member}}Yes{{else}}No{{/if}}
+</div>

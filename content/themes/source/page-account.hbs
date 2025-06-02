@@ -1,0 +1,126 @@
+{{!< default}}
+{{!-- Custom Account Page --}}
+
+<main class="gh-main gh-outer">
+    <div class="gh-inner">
+        <article class="gh-article {{post_class}}">
+            
+            {{!-- Check if user is NOT signed in --}}
+            {{#unless @member}}
+                <script>
+                    // Redirect to sign in page if not logged in
+                    window.location.href = '{{@site.url}}/signin/';
+                </script>
+            {{else}}
+            
+            <div class="gh-account-container" style="max-width: 800px; margin: 0 auto; padding: 60px 0;">
+                <div class="gh-account-inner">
+                    <div class="gh-account-header" style="text-align: center; margin-bottom: 48px;">
+                        <img src="{{asset "images/logo-light.png"}}" alt="{{@site.title}}" style="height: 40px; width: auto; display: block; margin: 0 auto 24px;">
+                        <h1 class="gh-account-title" style="font-size: 3.6rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin: 0 0 16px;">Your Account</h1>
+                        <p class="gh-account-description" style="font-size: 1.8rem; line-height: 1.4; color: #666;">Welcome back, {{@member.name}}!</p>
+                    </div>
+
+                    {{!-- Account Info Box --}}
+                    <div class="gh-account-box" style="background: white; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 32px;">
+                        <h2 style="font-size: 2.4rem; font-weight: 700; margin: 0 0 24px;">Account Information</h2>
+                        
+                        <div class="gh-account-info">
+                            <div class="gh-account-field" style="margin-bottom: 20px;">
+                                <label style="display: block; font-size: 1.4rem; color: #666; margin-bottom: 4px;">Name</label>
+                                <p style="font-size: 1.6rem; margin: 0;">{{#if @member.name}}{{@member.name}}{{else}}Not set{{/if}}</p>
+                            </div>
+                            
+                            <div class="gh-account-field" style="margin-bottom: 20px;">
+                                <label style="display: block; font-size: 1.4rem; color: #666; margin-bottom: 4px;">Email</label>
+                                <p style="font-size: 1.6rem; margin: 0;">{{@member.email}}</p>
+                            </div>
+                            
+                            <div class="gh-account-field" style="margin-bottom: 20px;">
+                                <label style="display: block; font-size: 1.4rem; color: #666; margin-bottom: 4px;">Member Since</label>
+                                <p style="font-size: 1.6rem; margin: 0;">{{date @member.created_at format="MMMM D, YYYY"}}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="gh-account-actions" style="margin-top: 32px;">
+                            <a href="#/portal/account/profile" class="gh-button" style="display: inline-block; padding: 12px 24px; font-size: 1.6rem; font-weight: 600; background: var(--ghost-accent-color); color: white; border: 2px solid var(--ghost-accent-color); text-decoration: none; margin-right: 12px;">Edit Profile</a>
+                            <a href="#signout" class="gh-button gh-button-secondary" data-members-signout style="display: inline-block; padding: 12px 24px; font-size: 1.6rem; font-weight: 600; background: white; color: var(--ghost-accent-color); border: 2px solid var(--ghost-accent-color); text-decoration: none;">Sign Out</a>
+                        </div>
+                    </div>
+
+                    {{!-- Subscription Info Box --}}
+                    <div class="gh-account-box" style="background: white; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 32px;">
+                        <h2 style="font-size: 2.4rem; font-weight: 700; margin: 0 0 24px;">Subscription</h2>
+                        
+                        {{#if @member.paid}}
+                            {{!-- Show active subscriptions --}}
+                            {{#foreach @member.subscriptions}}
+                                <div class="gh-subscription-card" style="padding: 20px; background: #f7f7f7; margin-bottom: 16px;">
+                                    <h3 style="font-size: 1.8rem; font-weight: 600; margin: 0 0 12px;">{{plan.name}}</h3>
+                                    <div class="gh-subscription-details">
+                                        <p style="font-size: 1.6rem; margin: 0 0 8px;">
+                                            <strong>Status:</strong> 
+                                            <span style="color: {{#match status "active"}}#079a3d{{else}}#f50b23{{/match}}; text-transform: capitalize;">{{status}}</span>
+                                        </p>
+                                        <p style="font-size: 1.6rem; margin: 0 0 8px;">
+                                            <strong>Price:</strong> {{price plan}}
+                                        </p>
+                                        {{#if current_period_end}}
+                                            <p style="font-size: 1.6rem; margin: 0;">
+                                                <strong>{{#if cancel_at_period_end}}Expires{{else}}Renews{{/if}}:</strong> 
+                                                {{date current_period_end format="MMMM D, YYYY"}}
+                                            </p>
+                                        {{/if}}
+                                    </div>
+                                    
+                                    <div style="margin-top: 20px;">
+                                        {{#unless cancel_at_period_end}}
+                                            <a href="#/portal/account/plans" class="gh-button" style="display: inline-block; padding: 8px 16px; font-size: 1.4rem; background: var(--ghost-accent-color); color: white; border: none; text-decoration: none; margin-right: 12px;">Change Plan</a>
+                                            <a href="#/portal/account/plans/cancel" class="gh-button gh-button-secondary" style="display: inline-block; padding: 8px 16px; font-size: 1.4rem; background: white; color: #f50b23; border: 2px solid #f50b23; text-decoration: none;">Cancel Subscription</a>
+                                        {{else}}
+                                            <a href="#/portal/account/plans" class="gh-button" style="display: inline-block; padding: 8px 16px; font-size: 1.4rem; background: var(--ghost-accent-color); color: white; border: none; text-decoration: none;">Reactivate</a>
+                                        {{/unless}}
+                                    </div>
+                                </div>
+                            {{/foreach}}
+                        {{else}}
+                            {{!-- Free member --}}
+                            <div class="gh-subscription-card" style="padding: 20px; background: #f7f7f7;">
+                                <h3 style="font-size: 1.8rem; font-weight: 600; margin: 0 0 12px;">Free Membership</h3>
+                                <p style="font-size: 1.6rem; margin: 0 0 20px;">You have access to all free content.</p>
+                                <a href="{{@site.url}}/signup/" class="gh-button" style="display: inline-block; padding: 12px 24px; font-size: 1.6rem; font-weight: 600; background: var(--ghost-accent-color); color: white; border: 2px solid var(--ghost-accent-color); text-decoration: none;">Upgrade to Paid</a>
+                            </div>
+                        {{/if}}
+                    </div>
+
+                    {{!-- Newsletter Preferences --}}
+                    <div class="gh-account-box" style="background: white; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                        <h2 style="font-size: 2.4rem; font-weight: 700; margin: 0 0 24px;">Email Preferences</h2>
+                        <p style="font-size: 1.6rem; margin: 0 0 20px;">Manage your newsletter subscriptions and email preferences.</p>
+                        <a href="#/portal/account/newsletters" class="gh-button" style="display: inline-block; padding: 12px 24px; font-size: 1.6rem; font-weight: 600; background: var(--ghost-accent-color); color: white; border: 2px solid var(--ghost-accent-color); text-decoration: none;">Manage Newsletters</a>
+                    </div>
+                </div>
+            </div>
+            
+            {{/unless}}
+            
+        </article>
+    </div>
+</main>
+
+{{!-- Handle sign out --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle sign out links
+    const signOutLinks = document.querySelectorAll('[data-members-signout]');
+    signOutLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Ghost members.js handles the actual signout
+            if (window.location.hash !== '#/portal/signout') {
+                window.location.hash = '#/portal/signout';
+            }
+        });
+    });
+});
+</script> 

@@ -27,6 +27,46 @@
         }
     </style>
 
+    {{!-- Direct optimization for expertise background images --}}
+    <style>
+        /* Directly optimize large background images */
+        .gh-skill-card:nth-child(1) {
+            background-image: url('/cdn-cgi/image/format=webp,quality=90,width=960/content/themes/source/assets/images/expertise-bg-1.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-blend-mode: overlay;
+        }
+        
+        .gh-skill-card:nth-child(2) {
+            background-image: url('/cdn-cgi/image/format=webp,quality=90,width=960/content/themes/source/assets/images/expertise-bg-2.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-blend-mode: overlay;
+        }
+        
+        .gh-skill-card:nth-child(3) {
+            background-image: url('/cdn-cgi/image/format=webp,quality=90,width=960/content/themes/source/assets/images/expertise-bg-3.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-blend-mode: overlay;
+        }
+        
+        /* Make the content more readable over the background */
+        .gh-skill-content {
+            z-index: 1;
+            position: relative;
+        }
+        
+        @media (max-width: 767px) {
+            .gh-skill-card {
+                background-size: cover;
+            }
+        }
+    </style>
+
     <script>
         /* The script for calculating the color contrast has been taken from
         https://gomakethings.com/dynamically-changing-the-text-color-based-on-background-color-contrast-with-vanilla-js/ */
@@ -52,12 +92,332 @@
     {{!-- Cloudflare Turnstile --}}
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
+    {{!-- Turnstile Integration for Ghost Forms --}}
+    <script>
+    // Turnstile Integration for Ghost Forms
+    // This script captures the Turnstile token and includes it in Ghost's AJAX form submissions
+
+    (function() {
+        'use strict';
+        
+        // Store tokens for each widget instance
+        const turnstileTokens = new Map();
+        
+        // Callback function for Turnstile
+        window.onTurnstileSuccess = function(token, widgetId) {
+            console.log('Turnstile token received for widget:', widgetId);
+            // Store token associated with the widget ID
+            if (widgetId) {
+                turnstileTokens.set(widgetId, token);
+            }
+            
+            // For backward compatibility, also store in a global variable
+            window.lastTurnstileToken = token;
+        };
+        
+        // Helper function to get token for a specific form
+        window.getTurnstileTokenForForm = function(form) {
+            const widget = form.querySelector('.cf-turnstile iframe');
+            if (widget && widget.id) {
+                const widgetId = widget.id.replace('cf-chl-widget-', '');
+                return turnstileTokens.get(widgetId) || window.lastTurnstileToken;
+            }
+            return window.lastTurnstileToken;
+        };
+        
+        // Intercept Ghost's form submissions
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options) {
+            // Check if this is a Ghost member API request
+            if (url && url.includes('/members/api/') && options && options.method === 'POST') {
+                try {
+                    // Parse the body
+                    let body = options.body;
+                    if (typeof body === 'string') {
+                        body = JSON.parse(body);
+                    }
+                    
+                    // Try to get the most recent token
+                    const token = window.lastTurnstileToken;
+                    if (token) {
+                        body['cf-turnstile-response'] = token;
+                        options.body = JSON.stringify(body);
+                        console.log('Added Turnstile token to request');
+                    } else {
+                        console.warn('No Turnstile token available');
+                    }
+                } catch (e) {
+                    console.error('Error adding Turnstile token:', e);
+                }
+            }
+            
+            // Call the original fetch
+            return originalFetch.apply(this, arguments);
+        };
+        
+        // Also handle XMLHttpRequest (in case Ghost uses it)
+        const originalXHRSend = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.send = function(data) {
+            if (this._url && this._url.includes('/members/api/') && this._method === 'POST') {
+                try {
+                    let body = data;
+                    if (typeof body === 'string') {
+                        body = JSON.parse(body);
+                    }
+                    
+                    const token = window.lastTurnstileToken;
+                    if (token) {
+                        body['cf-turnstile-response'] = token;
+                        data = JSON.stringify(body);
+                        console.log('Added Turnstile token to XHR request');
+                    }
+                } catch (e) {
+                    console.error('Error adding Turnstile token to XHR:', e);
+                }
+            }
+            
+            return originalXHRSend.call(this, data);
+        };
+        
+        // Capture XHR open to get URL and method
+        const originalXHROpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(method, url) {
+            this._method = method;
+            this._url = url;
+            return originalXHROpen.apply(this, arguments);
+        };
+        
+        // Reset token after successful submission or expiry
+        window.resetTurnstileToken = function() {
+            turnstileTokens.clear();
+            window.lastTurnstileToken = null;
+            // If Turnstile widgets exist, reset them
+            document.querySelectorAll('.cf-turnstile').forEach(widget => {
+                if (window.turnstile) {
+                    try {
+                        window.turnstile.reset(widget);
+                    } catch (e) {
+                        console.error('Error resetting Turnstile widget:', e);
+                    }
+                }
+            });
+        };
+        
+        // Listen for successful form submissions to reset token
+        document.addEventListener('ghost.signup.success', function() {
+            console.log('Form submitted successfully, resetting Turnstile');
+            window.resetTurnstileToken();
+        });
+        
+    })();
+    </script>
+
+    {{!-- Paid Tier Stripe Pre-fill Handler --}}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle paid tier forms
+        const paidForms = document.querySelectorAll('.gh-membership-paid-form');
+        
+        paidForms.forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const nameInput = form.querySelector('input[name="name"]');
+                const emailInput = form.querySelector('input[name="email"]');
+                const tierId = form.dataset.tierId;
+                const submitButton = form.querySelector('button[type="submit"]');
+                const errorElement = form.querySelector('[data-members-error]');
+                const successElement = form.querySelector('[data-members-success]');
+                
+                // Validate required fields
+                if (!emailInput.value || !nameInput.value) {
+                    form.classList.add('error');
+                    if (errorElement) {
+                        errorElement.textContent = 'Please fill in all fields.';
+                    }
+                    return;
+                }
+                
+                // Validate tier ID exists
+                if (!tierId) {
+                    console.error('No tier ID found for form');
+                    form.classList.add('error');
+                    if (errorElement) {
+                        errorElement.textContent = 'Unable to process subscription. Please refresh and try again.';
+                    }
+                    return;
+                }
+                
+                // Validate Turnstile
+                const turnstileWidget = form.querySelector('.cf-turnstile');
+                if (turnstileWidget && typeof turnstile !== 'undefined') {
+                    const token = turnstile.getResponse(turnstileWidget);
+                    if (!token) {
+                        form.classList.add('error');
+                        if (errorElement) {
+                            errorElement.textContent = 'Please complete the verification.';
+                        }
+                        return;
+                    }
+                }
+                
+                // Set loading state
+                form.classList.add('loading');
+                form.classList.remove('error', 'success');
+                submitButton.disabled = true;
+                
+                // Store customer data temporarily
+                const customerData = {
+                    name: nameInput.value,
+                    email: emailInput.value
+                };
+                
+                // Store in sessionStorage for retrieval
+                sessionStorage.setItem('ghost_checkout_prefill', JSON.stringify(customerData));
+                
+                // Show success state briefly before redirect
+                form.classList.remove('loading');
+                form.classList.add('success');
+                
+                // IMPORTANT: Choose your integration method
+                const useDirectStripe = true; // Changed to true - Using Stripe directly (email pre-fills!)
+                
+                if (useDirectStripe) {
+                    // Direct Stripe (email pre-fills but won't sync with Ghost)
+                    const stripeLinks = {
+                        'default': 'https://buy.stripe.com/28E5kDbelgLh6BK6hF0VO00'
+                    };
+                    console.log('Processing payment for tier ID:', tierId);
+                    const baseStripeUrl = stripeLinks[tierId] || stripeLinks['default'];
+                    const stripeUrl = `${baseStripeUrl}?prefilled_email=${encodeURIComponent(emailInput.value)}`;
+                    
+                    // Unfortunately, Stripe payment links don't support prefilled_name
+                    // Workarounds:
+                    // 1. Create customer via API first: requires backend changes
+                    // 2. Use client_reference_id to pass name: `&client_reference_id=${encodeURIComponent(nameInput.value)}`
+                    // 3. Use Stripe Checkout Sessions API instead of payment links: requires backend
+                    
+                    // Option: Pass name as client reference for your records (uncomment to use)
+                    // This won't pre-fill the name but will attach it to the payment
+                    // const stripeUrl = `${baseStripeUrl}?prefilled_email=${encodeURIComponent(emailInput.value)}&client_reference_id=${encodeURIComponent(nameInput.value)}`;
+                    
+                    // Store name for potential webhook processing
+                    const customerKey = `stripe_customer_${emailInput.value.toLowerCase()}`;
+                    localStorage.setItem(customerKey, JSON.stringify({
+                        name: nameInput.value,
+                        email: emailInput.value,
+                        timestamp: Date.now()
+                    }));
+                    
+                    setTimeout(() => {
+                        window.location.href = stripeUrl;
+                    }, 1000);
+                } else {
+                    // Ghost Portal (syncs with Ghost but email might not pre-fill)
+                    // Try multiple URL formats
+                    const portalUrls = [
+                        `#/portal/signup/${tierId}/monthly?email=${encodeURIComponent(emailInput.value)}`,
+                        `/#/portal/signup?plan=${tierId}&billing=monthly&email=${encodeURIComponent(emailInput.value)}`,
+                        `#/portal/signup/${tierId}?email=${encodeURIComponent(emailInput.value)}`
+                    ];
+                    
+                    // Use the first format by default, change index to try others
+                    // Try changing to portalUrls[1] or portalUrls[2] if email doesn't pre-fill
+                    const portalUrl = portalUrls[0]; // Testing format #1 first
+                    
+                    console.log('Redirecting to Portal:', portalUrl);
+                    
+                    setTimeout(() => {
+                        window.location.href = portalUrl;
+                    }, 1000);
+                }
+                
+                // Store data in localStorage as backup
+                localStorage.setItem('ghost_checkout_email', emailInput.value);
+                localStorage.setItem('ghost_checkout_name', nameInput.value);
+                
+                // Re-enable button after a delay if still on page (in case user navigates back)
+                setTimeout(() => {
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        form.classList.remove('loading', 'success');
+                    }
+                }, 3000);
+            });
+        });
+        
+        // For Portal interception (optional)
+        // This attempts to add Turnstile to Portal when it loads
+        if (typeof window.GhostPortal !== 'undefined') {
+            const originalPortalRoot = window.GhostPortal.render;
+            window.GhostPortal.render = function() {
+                const result = originalPortalRoot.apply(this, arguments);
+                
+                // Wait a bit for Portal to render
+                setTimeout(() => {
+                    const portalFrame = document.querySelector('[data-portal]');
+                    if (portalFrame) {
+                        console.log('Portal detected, attempting to inject Turnstile...');
+                        // This is where you'd inject Turnstile into Portal
+                        // Note: This is complex and may not work reliably
+                    }
+                }, 500);
+                
+                return result;
+            };
+        }
+        
+        // Try to pre-fill Portal forms when they appear
+        const observePortal = new MutationObserver((mutations) => {
+            // Check for Portal iframe
+            const portalFrame = document.querySelector('iframe[title*="portal"], iframe[src*="portal"]');
+            if (portalFrame) {
+                try {
+                    // Get stored data
+                    const email = localStorage.getItem('ghost_checkout_email');
+                    const name = localStorage.getItem('ghost_checkout_name');
+                    
+                    if (email || name) {
+                        // Try to access Portal's content (may be blocked by same-origin policy)
+                        const portalDoc = portalFrame.contentDocument || portalFrame.contentWindow.document;
+                        
+                        // Try to fill email field
+                        const emailInput = portalDoc.querySelector('input[type="email"], input[name="email"]');
+                        if (emailInput && email) {
+                            emailInput.value = email;
+                            emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+                        
+                        // Clear stored data after use
+                        localStorage.removeItem('ghost_checkout_email');
+                        localStorage.removeItem('ghost_checkout_name');
+                    }
+                } catch (e) {
+                    console.log('Could not access Portal iframe content - cross-origin restriction');
+                }
+            }
+        });
+        
+        // Start observing for Portal
+        observePortal.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+    </script>
+
 </head>
 <body class="{{body_class}} has-{{#match @custom.title_font "Elegant serif"}}serif{{else match @custom.title_font "Consistent mono"}}mono{{else}}sans{{/match}}-title has-{{#match @custom.body_font "Elegant serif"}}serif{{else}}sans{{/match}}-body">
 
 <div class="gh-viewport">
     
     {{> "components/navigation"}}
+
+    {{#is "home"}}
+        {{!-- Use the home.hbs template for the homepage --}}
+    {{else}}
+        {{> "components/header" headerStyle=@custom.header_style}}
+    {{/is}}
 
     {{{body}}}
     
@@ -72,11 +432,339 @@
 {{!-- Scripts - handle responsive videos, infinite scroll, and navigation dropdowns --}}
 <script src="{{asset "built/source.js"}}"></script>
 
-{{!-- Ghost outputs required functional scripts with this tag, it should always be the last thing before the closing body tag --}}
+{{!-- This tag outputs important meta, publicPath, and accessibility info --}}
 {{ghost_foot}}
 
 {{!-- SiteControl Widget Script --}}
 <script type="text/javascript" async src="//l.getsitecontrol.com/lw1lk1m4.js"></script>
+
+{{!-- Cloudflare Image Helper - Global Function --}}
+<script>
+// Define a global helper function for Cloudflare image optimization
+window.cfImage = function(url, options = {}) {
+    // Default options
+    const defaults = {
+        format: 'webp',
+        quality: '85',
+        width: null
+    };
+    
+    // Merge options
+    const opts = {...defaults, ...options};
+    
+    // Skip if already optimized or data URL
+    if (!url || url.includes('/cdn-cgi/image/') || url.startsWith('data:')) {
+        return url;
+    }
+    
+    // Build parameters
+    const params = [];
+    params.push(`format=${opts.format}`);
+    params.push(`quality=${opts.quality}`);
+    params.push('fit=cover');
+    if (opts.width) params.push(`width=${opts.width}`);
+    
+    // For theme assets, we might want to use a higher quality
+    if (isAsset && !opts.hasOwnProperty('quality')) {
+        // Remove the default quality
+        params.splice(params.findIndex(p => p.startsWith('quality=')), 1);
+        // Add higher quality for assets
+        params.push('quality=90');
+    }
+    
+    const paramString = params.join(',');
+    
+    // Handle absolute URLs
+    if (url.startsWith('http')) {
+        try {
+            const parsedUrl = new URL(url);
+            return `/cdn-cgi/image/${paramString}${parsedUrl.pathname}${parsedUrl.search}`;
+        } catch (e) {
+            return url;
+        }
+    }
+    
+    // Handle relative URLs
+    return `/cdn-cgi/image/${paramString}${url}`;
+};
+
+// Make cfImage available in the Ghost theme context for convenience
+if (typeof window.ghost !== 'undefined') {
+    window.ghost.cfImage = window.cfImage;
+}
+</script>
+
+{{!-- Cloudflare Image Optimization --}}
+<script>
+// Cloudflare Image Optimization
+document.addEventListener('DOMContentLoaded', function() {
+    // Helper function to create a Cloudflare optimized URL
+    function cfImageUrl(src, options = {}) {
+        // Default options
+        const defaults = {
+            format: 'webp',
+            quality: '85',
+            fit: 'cover',
+            width: null
+        };
+        
+        // Merge defaults with provided options
+        const opts = {...defaults, ...options};
+        
+        // Skip if already a Cloudflare Images URL or data URL
+        if (!src || src.includes('/cdn-cgi/image/') || src.startsWith('data:')) {
+            return src;
+        }
+        
+        // Priority paths that should always be processed
+        const priorityPaths = [
+            '/assets/',
+            'assets/',
+            '/content/themes/source/assets/',
+            'content/themes/source/assets/'
+        ];
+        
+        // Check if this is a priority path (assets directory)
+        let isPriorityPath = false;
+        for (const path of priorityPaths) {
+            if (src.includes(path)) {
+                isPriorityPath = true;
+                break;
+            }
+        }
+        
+        // Create parameters string
+        const params = [];
+        params.push(`format=${opts.format}`);
+        params.push(`quality=${opts.quality}`);
+        params.push(`fit=${opts.fit}`);
+        if (opts.width) params.push(`width=${opts.width}`);
+        
+        const paramsString = params.join(',');
+        
+        // For absolute URLs
+        if (src.startsWith('http')) {
+            try {
+                const url = new URL(src);
+                if (url.hostname === window.location.hostname) {
+                    return `/cdn-cgi/image/${paramsString}${url.pathname}${url.search}`;
+                }
+                return src; // Don't process external domains
+            } catch (e) {
+                return src;
+            }
+        }
+        
+        // For relative URLs
+        return `/cdn-cgi/image/${paramsString}${src}`;
+    }
+    
+    // Process all images with specific selectors
+    const selectors = [
+        'img[src*="images/"]',
+        'img[src*="content/images/"]',
+        '.kg-image',
+        '.post-card-image img',
+        '.feature-image',
+        '.gh-content img',
+        '.post-content img',
+        '.kg-gallery-image img',
+        '.site-logo',
+        '.site-icon',
+        '.author-profile-image',
+        '.gh-hero-author-img',
+        // Add explicit selectors for assets directory
+        'img[src*="assets/"]',
+        'img[src*="/assets/"]',
+        'img[src*="assets/images/"]',
+        'img[src*="content/themes/source/assets/"]',
+        'img[src*="content/themes/source/assets/images/"]',
+        'img[src*="content/themes/source/assets/built/"]'
+    ];
+    
+    // Function to process images
+    function processImages() {
+        document.querySelectorAll(selectors.join(', ')).forEach(img => {
+            // Skip already processed images
+            if (img.dataset.cfProcessed) return;
+            
+            const src = img.getAttribute('src');
+            if (!src) return;
+            
+            // Store original source
+            img.dataset.originalSrc = src;
+            
+            // Determine optimal size based on displayed size
+            let width = null;
+            const imgWidth = img.width || img.offsetWidth || img.naturalWidth || 0;
+            
+            if (imgWidth > 0) {
+                // Use closest standard size
+                if (imgWidth <= 320) width = 320;
+                else if (imgWidth <= 600) width = 600;
+                else if (imgWidth <= 960) width = 960;
+                else if (imgWidth <= 1200) width = 1200;
+                else if (imgWidth <= 2000) width = 2000;
+                else width = 2000; // Cap at 2000px
+            }
+            
+            // Create optimized URL
+            const optimizedUrl = cfImageUrl(src, {width});
+            img.setAttribute('src', optimizedUrl);
+            
+            // Mark as processed
+            img.dataset.cfProcessed = 'true';
+            
+            // Handle srcset if present
+            if (img.srcset) {
+                img.dataset.originalSrcset = img.srcset;
+                img.removeAttribute('srcset');
+            }
+        });
+    }
+    
+    // Also optimize CSS background images
+    function optimizeCssBackgroundImages() {
+        // Get all stylesheets
+        const stylesheets = Array.from(document.styleSheets);
+        
+        // Process each stylesheet
+        stylesheets.forEach(stylesheet => {
+            try {
+                // Skip external stylesheets for cross-origin security
+                if (stylesheet.href && new URL(stylesheet.href).origin !== window.location.origin) {
+                    return;
+                }
+                
+                // Get all CSS rules
+                const rules = Array.from(stylesheet.cssRules || stylesheet.rules || []);
+                
+                // Process each rule
+                rules.forEach(rule => {
+                    // Only process style rules
+                    if (rule.type === 1) { // CSSStyleRule
+                        const style = rule.style;
+                        
+                        // Check for background image
+                        if (style && style.backgroundImage) {
+                            const bgImage = style.backgroundImage;
+                            
+                            // Extract URL from url("...") format
+                            const urlMatch = bgImage.match(/url\(['"]?([^'")]+)['"]?\)/i);
+                            if (urlMatch && urlMatch[1]) {
+                                const url = urlMatch[1];
+                                
+                                // Skip already processed images
+                                if (url.includes('/cdn-cgi/image/') || url.startsWith('data:')) {
+                                    return;
+                                }
+                                
+                                // Check if this is an image we want to optimize
+                                const isOptimizableImage = url.includes('/assets/') || 
+                                                         url.includes('assets/') || 
+                                                         url.includes('expertise-bg') || 
+                                                         url.includes('.jpg') || 
+                                                         url.includes('.jpeg') || 
+                                                         url.includes('.png');
+                                
+                                if (isOptimizableImage) {
+                                    // Create optimized URL
+                                    const optimizedUrl = cfImageUrl(url, {
+                                        // Higher quality for background images
+                                        quality: '90',
+                                        // Often background images need to be larger
+                                        width: '1200'
+                                    });
+                                    
+                                    // Replace the background image with optimized one
+                                    try {
+                                        // Create a new rule with optimized background image
+                                        const newBgImage = bgImage.replace(url, optimizedUrl);
+                                        
+                                        // Apply it if possible
+                                        if (style.cssText) {
+                                            const newCssText = style.cssText.replace(bgImage, newBgImage);
+                                            rule.style.cssText = newCssText;
+                                        } else {
+                                            style.backgroundImage = newBgImage;
+                                        }
+                                    } catch (e) {
+                                        console.error('Could not optimize background image:', url, e);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (e) {
+                // Skip inaccessible stylesheets (CORS)
+                console.warn('Could not access stylesheet:', e);
+            }
+        });
+    }
+    
+    // Try to optimize background images as well
+    try {
+        optimizeCssBackgroundImages();
+    } catch (e) {
+        console.warn('Error optimizing CSS background images:', e);
+    }
+    
+    // Also process dynamically loaded stylesheets
+    const originalCreateElement = document.createElement;
+    document.createElement = function() {
+        const element = originalCreateElement.apply(this, arguments);
+        if (arguments[0].toLowerCase() === 'link' && element.addEventListener) {
+            element.addEventListener('load', function() {
+                if (this.rel === 'stylesheet') {
+                    setTimeout(optimizeCssBackgroundImages, 100);
+                }
+            });
+        }
+        return element;
+    };
+    
+    // Process images on page load
+    processImages();
+    
+    // Watch for new content (e.g., lazy-loaded images)
+    const observer = new MutationObserver(function(mutations) {
+        let hasNewImages = false;
+        
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                for (let i = 0; i < mutation.addedNodes.length; i++) {
+                    const node = mutation.addedNodes[i];
+                    if (node.nodeType === 1) { // Element node
+                        if ((node.tagName === 'IMG' && !node.dataset.cfProcessed) || 
+                            (node.querySelector && node.querySelector('img:not([data-cf-processed])'))) {
+                            hasNewImages = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+        
+        if (hasNewImages) {
+            processImages();
+        }
+    });
+    
+    // Start observing the document
+    observer.observe(document.body, { 
+        childList: true, 
+        subtree: true 
+    });
+    
+    // Reprocess on resize (for responsive images)
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(processImages, 200);
+    });
+});
+</script>
 
 </body>
 </html>
